@@ -14,21 +14,7 @@
 }    */
 $objekt = new Parser;
 $objekt->parse();
-/*$token = new Token;
-$token->_construct();*/
-/*
-class Token
-{
-    public $tokenType;
-    public $tokenAtr;
 
-    public function _construct($tokenType, $tokenAtr)
-    {
-        $this->token_type = $tokenType;
-        $this->token_atr = $tokenAtr;
-    }
-}
-*/
 class Parser
 {
 
@@ -47,23 +33,22 @@ class Parser
 
 //************* Vytvorenie pola
         $line = fgets(STDIN);
-        if(!preg_match('/^(.IPPcode19)*$/i',$line))
+        $headerIPP = preg_match('/^(.IPPcode19)*$/i',$line);
+        $trimedheaderIPP = trim($headerIPP);
+        if ($trimedheaderIPP != $headerIPP)
         {
-            echo "MISSIG HEADER"; //dat to na chybovy vystup
+            echo "Missing header .IPPcode19"; //dat to na chybovy vystup
             return 21; // navratovy kod pre chybnu hlavicku
         }
 
         while($line = fgets(STDIN)) // nacitanie vstupu
         {
             $line = trim(preg_replace("/#.*$/", "", $line)); //zrusenie komentov, medzier
-            //var_dump($line);
             $splitLineToWord = preg_split('/\s+/', $line); // rozdelenie stringu na slova
-            //var_dump($splitLineToWord);
-            //$splitLineToWord = explode(" ",$line);// rozdelenie stringu na slova rozdeli to vlastne do pola a slova su indexy
-            //$splitLineToWord = preg_split('/\s+/', $line, -1, PREG_SPLIT_NO_EMPTY);
-            //if ($line == null || $line == "\n"){
-            //cho "toto je slovo rozdelene";
-            //var_dump($splitLineToWord);
+
+            if ($line == "" || $line == "\n") //ked bude koment na riadku tak aby ho nebral k uvahu preskoci cely switch a nacita znovu
+                continue;
+
             $instruction = $xml->createElement("instruction");
             $program->appendChild($instruction);
             //*********************************************************************************************************
@@ -258,45 +243,15 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
                     break;
+                default:
+                        echo "zly operacny kod";
+                        return 22;
                 }
 
         }
         echo $xml->saveXML();
     }
-/****************************************************************************/
-/*    public function check_label(string $label, array $match) : int
-    {
-        if(preg_match('/^([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$label,$match))
-            return 0;
-        else
-            return 1;
-    }*/
-/****************************************************************************/
-    /*public function check_var($var,$match) : int
-    {
-        if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$var,$match))
-            return 0;
-        else
-            return 1;
-    }
-/****************************************************************************/
-    public function check_type($type,$match) : int
-    {
-        if(preg_match('/^(int|string|bool)$/',$type,$match))
-            return 0;
-        else
-            return 1;
-    }
-/****************************************************************************/
-  public function check_symb($symb,$match) : int
-    {
-        if(preg_match('/^int@[+-][0-9]+$/',$symb,$match));
-/****************************************************************************/
-        /*elseif(preg_match('/^bool@(true|false)$/',$symb,$match));
-/****************************************************************************/
-        /*elseif(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$symb,$match));
-        else return 1;*/
-    }
+
     public function addSymbToXML($xml,$instruction,$match,$i)
     {
         $argTmp = $xml->createElement("arg$i","$match[0]");
