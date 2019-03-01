@@ -143,22 +143,26 @@ class Parser
 
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[1],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "int";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^bool@(true|false)$/',$splitLineToWord[1],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "bool";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[1],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "string";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "nil";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
                     else
                     {
@@ -210,22 +214,26 @@ class Parser
 /************************* symb ***********************************************/
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "int";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^bool@(true|false)$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "bool";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "string";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "nil";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
                     else
                     {
@@ -286,22 +294,26 @@ class Parser
 /************************* symb1 ***********************************************/
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "int";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^bool@(true|false)$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "bool";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "string";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "nil";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
                     else
                     {
@@ -311,22 +323,26 @@ class Parser
                     $i = 3;
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[3],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "int";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^bool@(true|false)$/',$splitLineToWord[3],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "bool";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[3],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "string";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[3],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "nil";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
                     else
                     {
@@ -352,22 +368,26 @@ class Parser
                     $i = 2;
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "int";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^bool@(true|false)$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "bool";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "string";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[2],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "nil";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
                     else
                     {
@@ -378,22 +398,26 @@ class Parser
                     $i = 3;
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[3],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "int";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^bool@(true|false)$/',$splitLineToWord[3],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "bool";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
                     elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[3],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "string";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[3],$match))
                     {
-                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                        $var = "nil";
+                        $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
                     else
                     {
@@ -427,6 +451,7 @@ class Parser
 
         elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
         {
+            $var = "nil";
             $this->addSymbToXML($xml,$instruction,$match,$i);
         }
         else
@@ -434,10 +459,10 @@ class Parser
             CheckArgumentsAndError::errorMessage("Lexical error",23);
         }
     }
-    public function addSymbToXML($xml,$instruction,$match,$i)
+    public function addSymbToXML($xml,$instruction,$match,$var,$i)
     {
-        $argTmp = $xml->createElement("arg$i","$match[0]");
-        $var ="symb";
+        $match = explode("@",$match[0]);
+        $argTmp = $xml->createElement("arg$i","$match[1]");
         $argTmp->setAttribute("type",$var);
         $instruction->appendChild($argTmp);
     }
