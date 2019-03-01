@@ -51,7 +51,6 @@ class CheckArgumentsAndError
 class Parser
 {
 
-
     public function parse()
     {
         //XML
@@ -79,6 +78,11 @@ class Parser
         while($line = fgets(STDIN)) // nacitanie vstupu
         {
             $line = trim(preg_replace("/#.*$/", "", $line)); //zrusenie komentov, medzier
+            $line = preg_replace("/&/","&amp;",$line);
+            $pattern = array("<",">");
+            $replace = array("&lt;","&gt;");
+            $line = str_replace($pattern,$replace,$line);
+
             $splitLineToWord = preg_split('/\s+/', $line); // rozdelenie stringu na slova
 
             if ($line == "" || $line == "\n") //ked bude koment na riadku tak aby ho nebral k uvahu preskoci cely switch a nacita znovu
@@ -136,6 +140,7 @@ class Parser
                     }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
+
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
@@ -146,7 +151,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    elseif(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
@@ -159,6 +164,7 @@ class Parser
                     {
                         CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
+                    //$this->addAndCheckSymbol($splitLineToWord[1],$match);
                     break;
 /****************** 1 operand <label>******************************************/
                 case "CALL":
@@ -212,7 +218,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    elseif(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
+                    elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
@@ -288,7 +294,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    elseif(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
+                    elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
@@ -313,7 +319,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    elseif(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[3],$match))
+                    elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[3],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
@@ -354,7 +360,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    elseif(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
+                    elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
@@ -380,7 +386,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    elseif(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[3],$match))
+                    elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[3],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
@@ -402,6 +408,32 @@ class Parser
         echo $xml->saveXML();
     }
 
+    public function addAndCheckSymbol($splitLineToWord,$match)
+    {
+        if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[1],$match))
+        {
+            $this->addSymbToXML($xml,$instruction,$match,$i);
+        }
+
+        elseif(preg_match('/^bool@(true|false)$/',$splitLineToWord[1],$match))
+        {
+            $this->addSymbToXML($xml,$instruction,$match,$i);
+        }
+
+        elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[3],$match))
+        {
+            $this->addSymbToXML($xml,$instruction,$match,$i);
+        }
+
+        elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+        {
+            $this->addSymbToXML($xml,$instruction,$match,$i);
+        }
+        else
+        {
+            CheckArgumentsAndError::errorMessage("Lexical error",23);
+        }
+    }
     public function addSymbToXML($xml,$instruction,$match,$i)
     {
         $argTmp = $xml->createElement("arg$i","$match[0]");
@@ -429,10 +461,6 @@ class Parser
         $var ="type";
         $argTmp->setAttribute("type",$var);
         $instruction->appendChild($argTmp);
-    }
-    public function addAndCheckSymbol()
-    {
-
     }
 }
 
