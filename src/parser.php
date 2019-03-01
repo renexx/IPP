@@ -133,11 +133,13 @@ class Parser
                 case "INT2CHAR":
                 case "TYPE":
                 case "STRLEN":
+/************************** var ************************************************/
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    $splitLineToWord = preg_match('/^(GF|LF|TF)@([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match);
-                    $this->addVarToXML($xml,$instruction,$match,$i);
+                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match))
+                        $this->addVarToXML($xml,$instruction,$match,$i);
                     $i += 1;
+/************************* symb ***********************************************/
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
@@ -151,12 +153,18 @@ class Parser
                     if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
-
                     }
                     break;
 /****************** 2 operands <var><type>*************************************/
                 case "READ":
+                    $i = 1;
+                    $instruction->setAttribute("opcode",$opcodeName);
+                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match))
+                        $this->addVarToXML($xml,$instruction,$match,$i);
+                    $i += 1;
 
+                    if(preg_match('/^(int|string|bool)$/',$splitLineToWord[2],$match))
+                        $this->addTypeToXML($xml,$instruction,$match,$i);
                     break;
 /****************** 3 operands <var><symb1><symb2>*****************************/
                 case "ADD":
@@ -173,17 +181,86 @@ class Parser
                 case "CONCAT":
                 case "GETCHAR":
                 case "SETCHAR":
+                    $i = 1;
+                    $instruction->setAttribute("opcode",$opcodeName);
+                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match))
+                        $this->addVarToXML($xml,$instruction,$match,$i);
+                    $i += 1;
+/************************* symb1 ***********************************************/
+                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
 
+                    if(preg_match('/^bool@(true|false)$/',$splitLineToWord[2],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[2],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+    /************************* symb2 ***********************************************/
+                    $i = 3;
+                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[3],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
+                    if(preg_match('/^bool@(true|false)$/',$splitLineToWord[3],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[3],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
                     break;
                     //-- 3 operand <labe><symb1><symb2>
                 case "JUMPIFEQ":
                 case "JUMPIFNEQ":
+                    $i = 1;
+                    $instruction->setAttribute("opcode",$opcodeName);
+                    if(preg_match('/^([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match))
+                        $this->addLabelToXML($xml,$instruction,$match,$i);
 
+                    $i = 2;
+                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
+                    if(preg_match('/^bool@(true|false)$/',$splitLineToWord[2],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[2],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+    /************************* symb2 ***********************************************/
+                    $i = 3;
+                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[3],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
+                    if(preg_match('/^bool@(true|false)$/',$splitLineToWord[3],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[3],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
                     break;
                 }
 
         }
-
         echo $xml->saveXML();
     }
 /****************************************************************************/
@@ -238,6 +315,13 @@ class Parser
     {
         $argTmp = $xml->createElement("arg$i","$match[0]");
         $var ="label";
+        $argTmp->setAttribute("type",$var);
+        $instruction->appendChild($argTmp);
+    }
+    public function addTypeToXML($xml,$instruction,$match,$i)
+    {
+        $argTmp = $xml->createElement("arg$i","$match[0]");
+        $var ="type";
         $argTmp->setAttribute("type",$var);
         $instruction->appendChild($argTmp);
     }
