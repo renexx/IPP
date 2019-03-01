@@ -31,8 +31,9 @@ class CheckArgumentsAndError
     }
     public static function showHelp()
     {
+        
         echo("este neviem co sem napisem to az potom nakoniec spravim\n");
-        return 0;
+        exit(0);
 
     }
     public static function errorMessage($message,$exitCode)
@@ -107,8 +108,14 @@ class Parser
                     }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    $splitLineToWord = preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match);
-                    $this->addVarToXML($xml,$instruction,$match,$i);
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    {
+                        $this->addVarToXML($xml,$instruction,$match,$i);
+                    }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
 
                     break;
 /****************** 1 operand <symb>*******************************************/
@@ -126,19 +133,34 @@ class Parser
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
 
                     if(preg_match('/^bool@(true|false)$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
                     break;
 /****************** 1 operand <label>******************************************/
@@ -151,8 +173,15 @@ class Parser
                     }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    $splitLineToWord = preg_match('/^([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match);
-                    $this->addLabelToXML($xml,$instruction,$match,$i);
+                    if(preg_match('/^([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    {
+                        $this->addLabelToXML($xml,$instruction,$match,$i);
+                    }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
+
                     break;
 /****************** 2 operands <var><symb>*************************************/
                 case "MOVE":
@@ -167,28 +196,47 @@ class Parser
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
                     if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    {
                         $this->addVarToXML($xml,$instruction,$match,$i);
+                    }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     $i += 1;
 /************************* symb ***********************************************/
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^bool@(true|false)$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
                     if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     break;
 /****************** 2 operands <var><type>*************************************/
                 case "READ":
@@ -200,10 +248,18 @@ class Parser
                     $instruction->setAttribute("opcode",$opcodeName);
                     if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                         $this->addVarToXML($xml,$instruction,$match,$i);
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     $i += 1;
 
                     if(preg_match('/^(int|string|bool)$/',$splitLineToWord[2],$match))
                         $this->addTypeToXML($xml,$instruction,$match,$i);
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     break;
 /****************** 3 operands <var><symb1><symb2>*****************************/
                 case "ADD":
@@ -228,46 +284,77 @@ class Parser
                     $instruction->setAttribute("opcode",$opcodeName);
                     if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                         $this->addVarToXML($xml,$instruction,$match,$i);
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     $i += 1;
 /************************* symb1 ***********************************************/
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^bool@(true|false)$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
                     if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
     /************************* symb2 ***********************************************/
                     $i = 3;
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[3],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^bool@(true|false)$/',$splitLineToWord[3],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[3],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
 
                     break;
@@ -282,25 +369,42 @@ class Parser
                     $instruction->setAttribute("opcode",$opcodeName);
                     if(preg_match('/^([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                         $this->addLabelToXML($xml,$instruction,$match,$i);
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     $i = 2;
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^bool@(true|false)$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
 
     /************************* symb2 ***********************************************/
@@ -309,24 +413,37 @@ class Parser
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^bool@(true|false)$/',$splitLineToWord[3],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[3],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
                     if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
+                    else
+                    {
+                        CheckArgumentsAndError::errorMessage("Lexical error",23);
+                    }
                     break;
                 default:
-                    CheckArgumentsAndError::errorMessage("Bad operation name",23);
+                    CheckArgumentsAndError::errorMessage("Bad operation name",22);
                 }
 
         }
