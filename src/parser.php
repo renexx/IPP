@@ -47,6 +47,10 @@ class CheckArgumentsAndError
         fwrite(STDERR,$message);
         exit($exitCode);
     }
+    public static function checkXMLentities()
+    {
+
+    }
 }
 class Parser
 {
@@ -79,12 +83,12 @@ class Parser
         {
             $line = trim(preg_replace("/#.*$/", "", $line)); //zrusenie komentov, medzier
             $line = preg_replace("/&/","&amp;",$line);
-            $pattern = array("<",">");
-            $replace = array("&lt;","&gt;");
+            $pattern = array("<",">","\"","'");
+            $replace = array("&lt;","&gt;","&quot;","&apos;");
             $line = str_replace($pattern,$replace,$line);
-
+            var_dump($line);
             $splitLineToWord = preg_split('/\s+/', $line); // rozdelenie stringu na slova
-
+            var_dump($splitLineToWord);
             if ($line == "" || $line == "\n") //ked bude koment na riadku tak aby ho nebral k uvahu preskoci cely switch a nacita znovu
                 continue;
 
@@ -119,6 +123,9 @@ class Parser
                     }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
+                    echo "Ja som split vo vnutri\n";
+                    var_dump($splitLineToWord);
+
                     if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                     {
                         $this->addVarToXML($xml,$instruction,$match,$i);
@@ -141,7 +148,7 @@ class Parser
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
 
-                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^int@([\+-]?[0-9])+$/',$splitLineToWord[1],$match))
                     {
                         $var = "int";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -212,7 +219,7 @@ class Parser
                     }
                     $i += 1;
 /************************* symb ***********************************************/
-                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
+                    if(preg_match('/^int@([\+-]?[0-9])+$/',$splitLineToWord[2],$match))
                     {
                         $var = "int";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -292,7 +299,7 @@ class Parser
                     }
                     $i += 1;
 /************************* symb1 ***********************************************/
-                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
+                    if(preg_match('/^int@([\+-]?[0-9])+$/',$splitLineToWord[2],$match))
                     {
                         $var = "int";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -321,7 +328,7 @@ class Parser
                     }
     /************************* symb2 ***********************************************/
                     $i = 3;
-                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[3],$match))
+                    if(preg_match('/^int@([\+-]?[0-9])+$/',$splitLineToWord[3],$match))
                     {
                         $var = "int";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -366,7 +373,7 @@ class Parser
                         CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
                     $i = 2;
-                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[2],$match))
+                    if(preg_match('/^int@([\+-]?[0-9])+$/',$splitLineToWord[2],$match))
                     {
                         $var = "int";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -396,7 +403,7 @@ class Parser
 
     /************************* symb2 ***********************************************/
                     $i = 3;
-                    if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[3],$match))
+                    if(preg_match('/^int@([\+-]?[0-9])+$/',$splitLineToWord[3],$match))
                     {
                         $var = "int";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -434,7 +441,7 @@ class Parser
 
     public function addAndCheckSymbol($splitLineToWord,$match)
     {
-        if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[1],$match))
+        if(preg_match('/^int@([\+-]?[0-9])+$/',$splitLineToWord[1],$match))
         {
             $this->addSymbToXML($xml,$instruction,$match,$i);
         }
