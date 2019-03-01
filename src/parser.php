@@ -7,14 +7,42 @@
  */
 
 
-/*public static function showHelp()
-{
-    echo("este neviem co sem napisem to az potom nakoniec spravim");
-
-}    */
 $objekt = new Parser;
 $objekt->parse();
+$objektArgument = new CheckArgumentsAndError;
+$objektArgument->parseArguments($argc,$argv);
+class CheckArgumentsAndError
+{
+    public function parseArguments($argc,$argv)
+    {
+        if($argc > 2)
+        {
 
+            self::errorMessage("Wrong count of arguments",10);
+        }
+        elseif ($argc === 2)
+        {
+            if($argv[1] === "--help")
+                self::showHelp();
+            else
+                self::errorMessage("Bad argument",10);
+        }
+
+    }
+    public static function showHelp()
+    {
+        echo("este neviem co sem napisem to az potom nakoniec spravim\n");
+        return 0;
+
+    }
+    public static function errorMessage($message,$exitCode)
+    {
+        fclose(STDIN);
+        $message .= "\n";
+        fwrite(STDERR,$message);
+        exit($exitCode);
+    }
+}
 class Parser
 {
 
@@ -37,8 +65,7 @@ class Parser
         $trimedheaderIPP = trim($headerIPP);
         if ($trimedheaderIPP != $headerIPP)
         {
-            echo "Missing header .IPPcode19"; //dat to na chybovy vystup
-            return 21; // navratovy kod pre chybnu hlavicku
+            CheckArgumentsAndError::errorMessage("Missing header .IPPcode19",21);
         }
 
         while($line = fgets(STDIN)) // nacitanie vstupu
@@ -65,26 +92,34 @@ class Parser
                 case "POPFRAME":
                 case "RETURN":
                 case "BREAK":
-                    //if (count($splitLineToWord) != 1)
-                      // return 23;
-
+                    if (count($splitLineToWord) != 1)
+                    {
+                        CheckArgumentsAndError::errorMessage("Wrong count of operands",23);
+                    }
                     $instruction->setAttribute("opcode",$opcodeName);
                     break;
 /****************** 1 operand <var>********************************************/
                 case "DEFVAR":
                 case "POPS":
-                        $i = 1;
-                        $instruction->setAttribute("opcode",$opcodeName);
-                        $splitLineToWord = preg_match('/^(GF|LF|TF)@([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match);
-                        $this->addVarToXML($xml,$instruction,$match,$i);
+                    if (count($splitLineToWord) != 2)
+                    {
+                        CheckArgumentsAndError::errorMessage("Wrong count of operands",23);
+                    }
+                    $i = 1;
+                    $instruction->setAttribute("opcode",$opcodeName);
+                    $splitLineToWord = preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match);
+                    $this->addVarToXML($xml,$instruction,$match,$i);
 
-                    //}
                     break;
 /****************** 1 operand <symb>*******************************************/
                 case "PUSH":
                 case "WRITE":
                 case "EXIT":
                 case "DPRINT":
+                    if (count($splitLineToWord) != 2)
+                    {
+                        CheckArgumentsAndError::errorMessage("Wrong count of operands",23);
+                    }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[1],$match))
@@ -97,20 +132,26 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
-
-
+                    if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
                     break;
 /****************** 1 operand <label>******************************************/
                 case "CALL":
                 case "LABEL":
                 case "JUMP":
+                    if (count($splitLineToWord) != 2)
+                    {
+                        CheckArgumentsAndError::errorMessage("Wrong count of operands",23);
+                    }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    $splitLineToWord = preg_match('/^([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match);
+                    $splitLineToWord = preg_match('/^([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match);
                     $this->addLabelToXML($xml,$instruction,$match,$i);
                     break;
 /****************** 2 operands <var><symb>*************************************/
@@ -118,10 +159,14 @@ class Parser
                 case "INT2CHAR":
                 case "TYPE":
                 case "STRLEN":
+                    if (count($splitLineToWord) != 3)
+                    {
+                        CheckArgumentsAndError::errorMessage("Wrong count of operands",23);
+                    }
 /************************** var ************************************************/
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                         $this->addVarToXML($xml,$instruction,$match,$i);
                     $i += 1;
 /************************* symb ***********************************************/
@@ -135,16 +180,25 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[2],$match))
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
+                    if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
                     break;
 /****************** 2 operands <var><type>*************************************/
                 case "READ":
+                    if (count($splitLineToWord) != 3)
+                    {
+                        CheckArgumentsAndError::errorMessage("Wrong count of operands",23);
+                    }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                         $this->addVarToXML($xml,$instruction,$match,$i);
                     $i += 1;
 
@@ -166,9 +220,13 @@ class Parser
                 case "CONCAT":
                 case "GETCHAR":
                 case "SETCHAR":
+                    if (count($splitLineToWord) != 4)
+                    {
+                        CheckArgumentsAndError::errorMessage("Wrong count of operands",23);
+                    }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                         $this->addVarToXML($xml,$instruction,$match,$i);
                     $i += 1;
 /************************* symb1 ***********************************************/
@@ -182,10 +240,15 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[2],$match))
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
+                    if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
     /************************* symb2 ***********************************************/
                     $i = 3;
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[3],$match))
@@ -198,17 +261,26 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[3],$match))
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[3],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
+                    if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
                     break;
-                    //-- 3 operand <labe><symb1><symb2>
+                    //-- 3 operand <label><symb1><symb2>
                 case "JUMPIFEQ":
                 case "JUMPIFNEQ":
+                    if (count($splitLineToWord) != 4)
+                    {
+                        CheckArgumentsAndError::errorMessage("Wrong count of operands",23);
+                    }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    if(preg_match('/^([a-zA-Z]|[\_\-\$\&\%\*])([a-zA-Z]|[0-9]|[\_\-\$\&\%\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                         $this->addLabelToXML($xml,$instruction,$match,$i);
 
                     $i = 2;
@@ -222,10 +294,15 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[2],$match))
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
+                    if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
     /************************* symb2 ***********************************************/
                     $i = 3;
                     if(preg_match('/^int@[+-][0-9]+$/',$splitLineToWord[3],$match))
@@ -238,14 +315,18 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
 
-                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[\_\-\$\&\%\*])*$/',$splitLineToWord[3],$match))
+                    if(preg_match('/^string@([a-zA-Z]|[0-9]|\\\\[0-9]{3}|[_|-|\$|&|%|\*])*$/',$splitLineToWord[3],$match))
                     {
                         $this->addSymbToXML($xml,$instruction,$match,$i);
                     }
+                    if(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    {
+                        $this->addSymbToXML($xml,$instruction,$match,$i);
+                    }
+
                     break;
                 default:
-                        echo "zly operacny kod";
-                        return 22;
+                    CheckArgumentsAndError::errorMessage("Bad operation name",23);
                 }
 
         }
@@ -279,6 +360,10 @@ class Parser
         $var ="type";
         $argTmp->setAttribute("type",$var);
         $instruction->appendChild($argTmp);
+    }
+    public function addAndCheckSymbol()
+    {
+
     }
 }
 
