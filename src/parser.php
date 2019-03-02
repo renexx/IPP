@@ -5,6 +5,7 @@
  * @brief parser.php
  * @author René Bolf         <xbolfr00@stud.fit.vutbr.cz>
  */
+
 $objektArgument = new CheckArgumentsAndError;
 $objektArgument->parseArguments($argc,$argv);
 $objekt = new Parser;
