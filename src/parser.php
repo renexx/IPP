@@ -5,8 +5,6 @@
  * @brief parser.php
  * @author René Bolf         <xbolfr00@stud.fit.vutbr.cz>
  */
-
-
 $objektArgument = new CheckArgumentsAndError;
 $objektArgument->parseArguments($argc,$argv);
 $objekt = new Parser;
@@ -469,33 +467,6 @@ class Parser
         echo $xml->saveXML();
     }
 
-    public function addAndCheckSymbol($splitLineToWord,$match)
-    {
-        if(preg_match('/^int@([\+-]?[0-9])+$/',$splitLineToWord[1],$match))
-        {
-            $this->addSymbToXML($xml,$instruction,$match,$i);
-        }
-
-        elseif(preg_match('/^bool@(true|false)$/',$splitLineToWord[1],$match))
-        {
-            $this->addSymbToXML($xml,$instruction,$match,$i);
-        }
-
-        elseif(preg_match('/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/',$splitLineToWord[3],$match))
-        {
-            $this->addSymbToXML($xml,$instruction,$match,$i);
-        }
-
-        elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
-        {
-            $var = "nil";
-            $this->addSymbToXML($xml,$instruction,$match,$i);
-        }
-        else
-        {
-            CheckArgumentsAndError::errorMessage("Lexical error",23);
-        }
-    }
     public function addSymbToXML($xml,$instruction,$match,$var,$i)
     {
         $match = preg_replace("/&/","&amp;",$match);
