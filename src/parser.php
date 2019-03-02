@@ -7,8 +7,8 @@
  */
 
 
- $objektArgument = new CheckArgumentsAndError;
- $objektArgument->parseArguments($argc,$argv);
+$objektArgument = new CheckArgumentsAndError;
+$objektArgument->parseArguments($argc,$argv);
 $objekt = new Parser;
 $objekt->parse();
 
@@ -35,8 +35,22 @@ class CheckArgumentsAndError
     }
     public static function showHelp()
     {
-
-        echo "hovno\n";
+        echo "\n**********************************HELP**************************************************************************\n";
+        echo "RUN : php7.3 parse.php [--help]\n";
+        echo "HELP : --help\t print help\n";
+        echo "parse.php is a script type of filter. This script load source code IPPcode19(see section 6)\nfrom standrart input and check lexical and syntax correctness of code\n";
+        echo "script parse.php generate XML representation of code to the standart output according to the specification(see section 3.1)\n";
+        echo "\n******************************ERROR CODE*************************************************************************\n";
+        echo "21 - wrong or missing header in the source code written in IPPcode19. Right header is .IPPcode19 (case insensitive)\n";
+        echo "22 - unknown or wrong operation code(case insensitive) in the source code written in IPPcode19\n";
+        echo "23 - other lexical or syntax error of the source code wrote in IPPcode19\n ";
+        echo "\n******************************IPPcode19**************************************************************************\n";
+        echo "Unstructured imperative language includes three-line instuctions.\n";
+        echo "Each instruction consist of the operating code (case insensitive) and operands (case sensitive)\n";
+        echo "There is a maximum of one instruction per line and it is not allowed to write one instruction on multiple rows\n";
+        echo "Each operand is a variable,constant,type or label.\n";
+        echo "Comment - # is a one-line comment\n";
+        echo "Code starts with header (.IPPcode19)\n";
         exit(0);
     }
 
@@ -53,20 +67,17 @@ class Parser
 
     public function parse()
     {
-        //XML
-//**********************************************************************************************
-        $xml = new DOMDocument("1.0", "UTF-8"); //vytvori xml s hlavickou 1.0 a UTF-8
-        $xml->formatOutput = true; //aby bol format taky aky je pod sebou a nie vedla seba
-        $program = $xml->createElement("program"); //vytvori element program
-        $program->setAttribute("language","IPPcode19"); //a nastavi mu atribut
-        $xml->appendChild($program);//program je decko xml elementu
+        $xml = new DOMDocument("1.0", "UTF-8"); //create xml with header 1.0 a UTF-8
+        $xml->formatOutput = true; //for better format
+        $program = $xml->createElement("program"); //create element program
+        $program->setAttribute("language","IPPcode19"); //set attribut program
+        $xml->appendChild($program);//program is a child xml element
 
-        $order = 1; //toto je pocitanie order začina od 1
+        $order = 1; //order counter
 
-//************* Vytvorenie pola
         if($line = fgets(STDIN))
         {
-            $trimline = trim($line);
+            $trimline = trim($line); //Strip whitespace (or other characters) from the beginning and end of a string
             if(!preg_match('/^(.IPPcode19)*$/i',$trimline,$matchHeader))
                 CheckArgumentsAndError::errorMessage("Missing header .IPPcode19",21);
         }
@@ -75,22 +86,21 @@ class Parser
             CheckArgumentsAndError::errorMessage("ERROR INPUT ",11);
         }
 
-        while($line = fgets(STDIN)) // nacitanie vstupu
+        while($line = fgets(STDIN)) // load input
         {
-            $line = trim(preg_replace("/#.*$/", "", $line)); //zrusenie komentov, medzier
-            $splitLineToWord = preg_split('/\s+/', $line); // rozdelenie stringu na slova
+            $line = trim(preg_replace("/#.*$/", "", $line)); //delete comments and whitespace
+            $splitLineToWord = preg_split('/\s+/', $line); // split string to  words
 
-            if ($line == "" || $line == "\n") //ked bude koment na riadku tak aby ho nebral k uvahu preskoci cely switch a nacita znovu
+            if ($line == "" || $line == "\n") // when comment or enter is on on the line skip switch
                 continue;
 
             $instruction = $xml->createElement("instruction");
             $program->appendChild($instruction);
-            //*********************************************************************************************************
-            $instruction->setAttribute("order",$order); //nastavenie order
-            $order++; //zvysovanie toho countra
+            $instruction->setAttribute("order",$order);
+            $order++;
 
             $opcodeName = strtoupper($splitLineToWord[0]);
-            //$instruction->setAttribute("opcode",$opcodeName);
+
             switch($opcodeName)
             {
 /******************  0 operand *****************************/
@@ -117,14 +127,12 @@ class Parser
 
                     if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
                     {
-                        //$match = preg_replace("/&/","&amp;",$match);
                         $this->addVarToXML($xml,$instruction,$match,$i);
                     }
                     else
                     {
                         CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
-
                     break;
 /****************** 1 operand <symb>*******************************************/
                 case "PUSH":
@@ -171,7 +179,6 @@ class Parser
                     {
                         CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
-                    //$this->addAndCheckSymbol($splitLineToWord[1],$match);
                     break;
 /****************** 1 operand <label>******************************************/
                 case "CALL":
@@ -370,7 +377,7 @@ class Parser
                     }
 
                     break;
-                    //-- 3 operand <label><symb1><symb2>
+/************************** 3 operand <label><symb1><symb2>**************************/
                 case "JUMPIFEQ":
                 case "JUMPIFNEQ":
                     if (count($splitLineToWord) != 4)
