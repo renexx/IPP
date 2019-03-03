@@ -1,0 +1,24 @@
+.IPPcode19#a     #a
+#skuska komentu
+CREATEFRAME
+defvar GF@cou&nter#totojekoment
+jump while
+label end
+push bool@true
+push int@9
+write string@a
+move GF@counter string@šanoZadejte\032obs&ah:aaasauj<e\032Œ™Ѭaletotije>autoavelke_*+"$'aa'
+read GF@operace string
+read LF@haaha int
+add GF@hah int@9 bool@true
+JUMPIFEQ plus bool@true string@aaas
+JUMPIFEQ minus bool@true string@abc
+JUMPIFEQ krat bool@true string@ab
+JUMPIFEQ deleno bool@true string@c#ca
+WRITE string@Zadejte\032obsahuje\032Œ™Ѭ<
+PUSH nil@nil
+move GF@counter GF@string
+JUMPIFEQ plus GF@string GF@stringaaa
+#aaah
+#aaah
+#aaah
