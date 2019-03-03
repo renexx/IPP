@@ -76,8 +76,8 @@ class Parser
 
         if($line = fgets(STDIN))
         {
-            $trimline = trim(preg_replace("/#.*$/", "", $line)); //Strip whitespace (or other characters) from the beginning and end of a string
-            if(!preg_match('/^(.IPPcode19)*$/i',$trimline,$matchHeader))
+            $trimline = trim(preg_replace("/#.*$/", "",$line)); //Strip whitespace (or other characters) from the beginning and end of a string
+            if(!preg_match('/^.IPPcode19$/i',$trimline,$matchHeader))
                 CheckArgumentsAndError::errorMessage("Missing header .IPPcode19",21);
         }
         else
@@ -169,7 +169,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[1],$match))
+                    elseif(preg_match('/^nil@nil$/',$splitLineToWord[1],$match))
                     {
                         $var = "nil";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -246,7 +246,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[2],$match))
+                    elseif(preg_match('/^nil@nil$/',$splitLineToWord[2],$match))
                     {
                         $var = "nil";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -331,7 +331,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[2],$match))
+                    elseif(preg_match('/^nil@nil$/',$splitLineToWord[2],$match))
                     {
                         $var = "nil";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -365,7 +365,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[3],$match))
+                    elseif(preg_match('/^nil@nil$/',$splitLineToWord[3],$match))
                     {
                         $var = "nil";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -415,7 +415,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[2],$match))
+                    elseif(preg_match('/^nil@nil$/',$splitLineToWord[2],$match))
                     {
                         $var = "nil";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
@@ -450,7 +450,7 @@ class Parser
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);
                     }
 
-                    elseif(preg_match('/^nil@(nil)$/',$splitLineToWord[3],$match))
+                    elseif(preg_match('/^nil@nil$/',$splitLineToWord[3],$match))
                     {
                         $var = "nil";
                         $this->addSymbToXML($xml,$instruction,$match,$var,$i);

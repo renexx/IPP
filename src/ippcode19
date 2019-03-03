@@ -1,5 +1,4 @@
-.IPPcode19#a     #a
-#skuska komentu
+.IPPCODE19
 CREATEFRAME
 defvar GF@cou&nter#totojekoment
 jump while
@@ -13,7 +12,7 @@ read LF@haaha int
 add GF@hah int@9 bool@true
 JUMPIFEQ plus bool@true string@aaas
 JUMPIFEQ minus bool@true string@abc
-JUMPIFEQ krat bool@true string@ab
+JUMPIFEQ krat bool@true string@
 JUMPIFEQ deleno bool@true string@c#ca
 WRITE string@Zadejte\032obsahuje\032Œ™Ѭ<
 PUSH nil@nil
