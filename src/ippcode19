@@ -1,4 +1,4 @@
-.IPPCODE19
+.IPPcODE19#aaa
 CREATEFRAME
 defvar GF@cou&nter#totojekoment
 jump while
@@ -6,7 +6,7 @@ label end
 push bool@true
 push int@9
 write string@a
-move GF@counter string@šanoZadejte\032obs&ah:aaasauj<e\032Œ™Ѭaletotije>autoavelke_*+"$'aa'
+move GF@!?_coun&ter string@šanoZadejte\032obs&ah:aaasauj<e\032Œ™Ѭaletotije>autoavelke_*+"$'aa'
 read GF@operace string
 read LF@haaha int
 add GF@hah int@9 bool@true
@@ -21,3 +21,7 @@ JUMPIFEQ plus GF@string GF@stringaaa
 #aaah
 #aaah
 #aaah
+#aaa
+DEFVAR GF@counter#komentar
+#ajajajajajja
+#ajajajajajja

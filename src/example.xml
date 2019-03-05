@@ -20,7 +20,7 @@
     <arg1 type="string">a</arg1>
   </instruction>
   <instruction order="8" opcode="MOVE">
-    <arg1 type="var">GF@counter</arg1>
+    <arg1 type="var">GF@!?_coun&amp;ter</arg1>
     <arg2 type="string">šanoZadejte\032obs&amp;ah:aaasauj&lt;e\032Œ™Ѭaletotije&gt;autoavelke_*+"$'aa'</arg2>
   </instruction>
   <instruction order="9" opcode="READ">
@@ -70,5 +70,8 @@
     <arg1 type="label">plus</arg1>
     <arg2 type="var">GF@string</arg2>
     <arg3 type="var">GF@stringaaa</arg3>
+  </instruction>
+  <instruction order="20" opcode="DEFVAR">
+    <arg1 type="var">GF@counter</arg1>
   </instruction>
 </program>

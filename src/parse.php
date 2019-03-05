@@ -124,7 +124,7 @@ class Parser
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
 
-                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[1],$match))
                     {
                         $this->addVarToXML($xml,$instruction,$match,$i);
                     }
@@ -145,7 +145,7 @@ class Parser
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
 
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[1],$match))
                     {
                         $var = "var";
                         $this->addVarToXML($xml,$instruction,$match,$i);
@@ -211,7 +211,7 @@ class Parser
 /************************** var ************************************************/
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[1],$match))
                     {
                         $this->addVarToXML($xml,$instruction,$match,$i);
                     }
@@ -222,7 +222,7 @@ class Parser
                     $i += 1;
 /************************* symb ***********************************************/
 
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[2],$match))
                     {
                         $var = "var";
                         $this->addVarToXML($xml,$instruction,$match,$i);
@@ -264,7 +264,7 @@ class Parser
                     }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[1],$match))
                         $this->addVarToXML($xml,$instruction,$match,$i);
                     else
                     {
@@ -300,7 +300,7 @@ class Parser
                     }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[1],$match))
                         $this->addVarToXML($xml,$instruction,$match,$i);
                     else
                     {
@@ -308,7 +308,7 @@ class Parser
                     }
                     $i += 1;
 /************************* symb1 ***********************************************/
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[2],$match))
                     {
                         $var = "var";
                         $this->addVarToXML($xml,$instruction,$match,$i);
@@ -342,7 +342,7 @@ class Parser
                     }
     /************************* symb2 ***********************************************/
                     $i = 3;
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[3],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[3],$match))
                     {
                         $var = "var";
                         $this->addVarToXML($xml,$instruction,$match,$i);
@@ -392,7 +392,7 @@ class Parser
                         CheckArgumentsAndError::errorMessage("Lexical error",23);
                     }
                     $i = 2;
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[2],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[2],$match))
                     {
                         $var = "var";
                         $this->addVarToXML($xml,$instruction,$match,$i);
@@ -427,7 +427,7 @@ class Parser
 
     /************************* symb2 ***********************************************/
                     $i = 3;
-                    if(preg_match('/^(GF|LF|TF)@([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[3],$match))
+                    if(preg_match('/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[3],$match))
                     {
                         $var = "var";
                         $this->addVarToXML($xml,$instruction,$match,$i);
