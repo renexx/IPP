@@ -189,7 +189,7 @@ class Parser
                     }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    if(preg_match('/^([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[1],$match))
                     {
                         $this->addLabelToXML($xml,$instruction,$match,$i);
                     }
@@ -385,7 +385,7 @@ class Parser
                     }
                     $i = 1;
                     $instruction->setAttribute("opcode",$opcodeName);
-                    if(preg_match('/^([a-zA-Z]|[_|-|\$|&|%|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\*])*$/',$splitLineToWord[1],$match))
+                    if(preg_match('/^([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/',$splitLineToWord[1],$match))
                         $this->addLabelToXML($xml,$instruction,$match,$i);
                     else
                     {

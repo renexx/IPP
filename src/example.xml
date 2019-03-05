@@ -8,7 +8,7 @@
     <arg1 type="label">while</arg1>
   </instruction>
   <instruction order="4" opcode="LABEL">
-    <arg1 type="label">end</arg1>
+    <arg1 type="label">?end</arg1>
   </instruction>
   <instruction order="5" opcode="PUSH">
     <arg1 type="bool">true</arg1>

@@ -2,7 +2,7 @@
 CREATEFRAME
 defvar GF@cou&nter#totojekoment
 jump while
-label end
+label ?end
 push bool@true
 push int@9
 write string@a
