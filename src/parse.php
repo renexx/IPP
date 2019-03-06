@@ -1,9 +1,9 @@
 <?php
 /**
  * Project: IPP project
- *
- * @brief parse.php
- * @author René Bolf         <xbolfr00@stud.fit.vutbr.cz>
+ * @file parse.php
+ * @brief IPPcode19 code analyzer
+ * @author René Bolf <xbolfr00@stud.fit.vutbr.cz>
  */
 
 class CheckArgumentsAndError
@@ -57,12 +57,12 @@ class CheckArgumentsAndError
 
 class Parser
 {
-    public $variable = '/^(LF|GF|TF)@([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/';
+    public $variable = '/^(LF|GF|TF)@([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$/';
     public $symbInt = '/^int@([\+-]?[0-9])+$/';
     public $symbString = '/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/';
     public $symbBool = '/^bool@(true|false)$/';
     public $symbNil = '/^nil@nil$/';
-    public $label = '/^([a-zA-Z]|[_|-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|-|\$|&|%|\?|\!|\*])*$/';
+    public $label = '/^([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$/';
     public $type = '/^(int|string|bool)$/';
     
     public function parse()

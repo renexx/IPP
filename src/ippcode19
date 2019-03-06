@@ -1,6 +1,7 @@
 .IPPcODE19#aaa
 CREATEFRAME
-defvar GF@cou&nter#totojekoment
+defvar GF@*?_!cou&nter#totojekoment
+defvar GF@-?!_-
 jump while
 label ?end
 push bool@true
@@ -16,7 +17,7 @@ JUMPIFEQ krat bool@true string@
 JUMPIFEQ deleno bool@true string@c#ca
 WRITE string@Zadejte\032obsahuje\032Œ™Ѭ<
 PUSH nil@nil
-move GF@counter GF@string
+move GF@counter GF@stri&ng
 JUMPIFEQ plus GF@string GF@stringaaa
 #aaah
 #aaah
@@ -25,3 +26,5 @@ JUMPIFEQ plus GF@string GF@stringaaa
 DEFVAR GF@counter#komentar
 #ajajajajajja
 #ajajajajajja
+label -?!*$
+move LF@counter string@šýáčíáťíčťíčťáčýč@a a
