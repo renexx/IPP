@@ -7,81 +7,148 @@
   <instruction order="3" opcode="DEFVAR">
     <arg1 type="var">GF@-?!_-</arg1>
   </instruction>
-  <instruction order="4" opcode="JUMP">
-    <arg1 type="label">while</arg1>
+  <instruction order="4" opcode="DEFVAR">
+    <arg1 type="var">GF@_?!_-</arg1>
   </instruction>
-  <instruction order="5" opcode="LABEL">
+  <instruction order="5" opcode="DEFVAR">
+    <arg1 type="var">GF@?!_-</arg1>
+  </instruction>
+  <instruction order="6" opcode="DEFVAR">
+    <arg1 type="var">GF@&amp;?!_-</arg1>
+  </instruction>
+  <instruction order="7" opcode="DEFVAR">
+    <arg1 type="var">GF@!&amp;?!_-</arg1>
+  </instruction>
+  <instruction order="8" opcode="DEFVAR">
+    <arg1 type="var">GF@%&amp;?!_-</arg1>
+  </instruction>
+  <instruction order="9" opcode="DEFVAR">
+    <arg1 type="var">GF@*&amp;?!_-</arg1>
+  </instruction>
+  <instruction order="10" opcode="DEFVAR">
+    <arg1 type="var">GF@$&amp;?!_-</arg1>
+  </instruction>
+  <instruction order="11" opcode="JUMP">
+    <arg1 type="label">While</arg1>
+  </instruction>
+  <instruction order="12" opcode="LABEL">
     <arg1 type="label">?end</arg1>
   </instruction>
-  <instruction order="6" opcode="PUSH">
+  <instruction order="13" opcode="PUSHS">
     <arg1 type="bool">true</arg1>
   </instruction>
-  <instruction order="7" opcode="PUSH">
+  <instruction order="14" opcode="PUSHS">
     <arg1 type="int">9</arg1>
   </instruction>
-  <instruction order="8" opcode="WRITE">
+  <instruction order="15" opcode="PUSHS">
+    <arg1 type="int">+9</arg1>
+  </instruction>
+  <instruction order="16" opcode="PUSHS">
+    <arg1 type="int">-9</arg1>
+  </instruction>
+  <instruction order="17" opcode="PUSHS">
+    <arg1 type="int">000000009</arg1>
+  </instruction>
+  <instruction order="18" opcode="PUSHS">
+    <arg1 type="int">09</arg1>
+  </instruction>
+  <instruction order="19" opcode="PUSHS">
+    <arg1 type="int">+09</arg1>
+  </instruction>
+  <instruction order="20" opcode="WRITE">
     <arg1 type="string">a</arg1>
   </instruction>
-  <instruction order="9" opcode="MOVE">
+  <instruction order="21" opcode="MOVE">
     <arg1 type="var">GF@!?_coun&amp;ter</arg1>
-    <arg2 type="string">šanoZadejte\032obs&amp;ah:aaasauj&lt;e\032Œ™Ѭaletotije&gt;autoavelke_*+"$'aa'</arg2>
+    <arg2 type="string">7šano7Zadejte\032obs&amp;ah:aaasauj&lt;e\032Œ™Ѭaletotije&gt;autoavelke_*+"$'aa'</arg2>
   </instruction>
-  <instruction order="10" opcode="READ">
+  <instruction order="22" opcode="READ">
     <arg1 type="var">GF@operace</arg1>
     <arg2 type="type">string</arg2>
   </instruction>
-  <instruction order="11" opcode="READ">
+  <instruction order="23" opcode="READ">
     <arg1 type="var">LF@haaha</arg1>
     <arg2 type="type">int</arg2>
   </instruction>
-  <instruction order="12" opcode="ADD">
+  <instruction order="24" opcode="ADD">
     <arg1 type="var">GF@hah</arg1>
     <arg2 type="int">9</arg2>
     <arg3 type="bool">true</arg3>
   </instruction>
-  <instruction order="13" opcode="JUMPIFEQ">
-    <arg1 type="label">plus</arg1>
-    <arg2 type="bool">true</arg2>
-    <arg3 type="string">aaas</arg3>
-  </instruction>
-  <instruction order="14" opcode="JUMPIFEQ">
-    <arg1 type="label">minus</arg1>
-    <arg2 type="bool">true</arg2>
-    <arg3 type="string">abc</arg3>
-  </instruction>
-  <instruction order="15" opcode="JUMPIFEQ">
+  <instruction order="25" opcode="JUMPIFEQ">
     <arg1 type="label">krat</arg1>
     <arg2 type="bool">true</arg2>
     <arg3 type="string"/>
   </instruction>
-  <instruction order="16" opcode="JUMPIFEQ">
+  <instruction order="26" opcode="JUMPIFEQ">
     <arg1 type="label">deleno</arg1>
     <arg2 type="bool">true</arg2>
     <arg3 type="string">c</arg3>
   </instruction>
-  <instruction order="17" opcode="WRITE">
+  <instruction order="27" opcode="WRITE">
     <arg1 type="string">Zadejte\032obsahuje\032Œ™Ѭ&lt;</arg1>
   </instruction>
-  <instruction order="18" opcode="PUSH">
+  <instruction order="28" opcode="PUSHS">
     <arg1 type="nil">nil</arg1>
   </instruction>
-  <instruction order="19" opcode="MOVE">
-    <arg1 type="var">GF@counter</arg1>
-    <arg2 type="var">GF@stri&amp;ng</arg2>
+  <instruction order="29" opcode="MOVE">
+    <arg1 type="var">GF@string</arg1>
+    <arg2 type="var">GF@string</arg2>
   </instruction>
-  <instruction order="20" opcode="JUMPIFEQ">
+  <instruction order="30" opcode="JUMPIFEQ">
     <arg1 type="label">plus</arg1>
     <arg2 type="var">GF@string</arg2>
     <arg3 type="var">GF@stringaaa</arg3>
   </instruction>
-  <instruction order="21" opcode="DEFVAR">
-    <arg1 type="var">GF@counter</arg1>
+  <instruction order="31" opcode="DEFVAR">
+    <arg1 type="var">GF@couAnter</arg1>
   </instruction>
-  <instruction order="22" opcode="LABEL">
+  <instruction order="32" opcode="LABEL">
     <arg1 type="label">-?!*$</arg1>
   </instruction>
-  <instruction order="23" opcode="MOVE">
+  <instruction order="33" opcode="LABEL">
+    <arg1 type="label">?!*$</arg1>
+  </instruction>
+  <instruction order="34" opcode="LABEL">
+    <arg1 type="label">!?!*$</arg1>
+  </instruction>
+  <instruction order="35" opcode="LABEL">
+    <arg1 type="label">_?!*$</arg1>
+  </instruction>
+  <instruction order="36" opcode="LABEL">
+    <arg1 type="label">&amp;-?!*$</arg1>
+  </instruction>
+  <instruction order="37" opcode="LABEL">
+    <arg1 type="label">%?!*$</arg1>
+  </instruction>
+  <instruction order="38" opcode="LABEL">
+    <arg1 type="label">$-?!*$</arg1>
+  </instruction>
+  <instruction order="39" opcode="LABEL">
+    <arg1 type="label">*-?!*$</arg1>
+  </instruction>
+  <instruction order="40" opcode="MOVE">
     <arg1 type="var">LF@counter</arg1>
     <arg2 type="string">šýáčíáťíčťíčťáčýč</arg2>
+  </instruction>
+  <instruction order="41" opcode="AND">
+    <arg1 type="var">GF@hah</arg1>
+    <arg2 type="int">9</arg2>
+    <arg3 type="bool">true</arg3>
+  </instruction>
+  <instruction order="42" opcode="AND">
+    <arg1 type="var">GF@haah</arg1>
+    <arg2 type="int">97</arg2>
+    <arg3 type="bool">true</arg3>
+  </instruction>
+  <instruction order="43" opcode="OR">
+    <arg1 type="var">GF@haah</arg1>
+    <arg2 type="int">97</arg2>
+    <arg3 type="bool">true</arg3>
+  </instruction>
+  <instruction order="44" opcode="NOT">
+    <arg1 type="var">GF@haah</arg1>
+    <arg2 type="int">97</arg2>
+    <arg3 type="bool">true</arg3>
   </instruction>
 </program>

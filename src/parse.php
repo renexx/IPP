@@ -1,13 +1,22 @@
 <?php
 /**
- * Project: IPP project
+ * Project: Project for Principles of Programming Languages subject
  * @file parse.php
- * @brief IPPcode19 code analyzer
+ * @brief This script load source code IPPcode19 from standrart input and check lexical and syntax correctness of code script parse.php generate XML representation of code to the standart output.
  * @author René Bolf <xbolfr00@stud.fit.vutbr.cz>
  */
 
+/**
+ * @class CheckArgumentsAndError
+ * @brief This is class for check arguments, help and for error 
+ */
 class CheckArgumentsAndError
 {
+    /**
+     * @brief Method parseArguments, for parse and check arguments
+     * @param $argc
+     * @param $argv
+     */
     public function parseArguments($argc,$argv)
     {
         if($argc > 2)
@@ -25,6 +34,9 @@ class CheckArgumentsAndError
                 self::errorMessage("Bad argument",10);
         }
     }
+    /**
+     * @brief Method show help, for printing help
+     */
     public static function showHelp()
     {
         echo "\n**********************************HELP**************************************************************************\n";
@@ -46,6 +58,11 @@ class CheckArgumentsAndError
         exit(0);
     }
 
+    /**
+     * @brief Method errorMessage this method write to the STDERR error message and error code
+     * @param $message is a message for error code
+     * @param $exitCode is error code
+     */
     public static function errorMessage($message,$exitCode)
     {
         fclose(STDIN);
@@ -54,17 +71,23 @@ class CheckArgumentsAndError
         exit($exitCode);
     }
 }
-
+/**
+ * @class Parser
+ * @brief This is class for lexical and syntactic analysis
+ */
 class Parser
 {
-    public $variable = '/^(LF|GF|TF)@([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$/';
-    public $symbInt = '/^int@([\+-]?[0-9])+$/';
-    public $symbString = '/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/';
-    public $symbBool = '/^bool@(true|false)$/';
-    public $symbNil = '/^nil@nil$/';
-    public $label = '/^([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$/';
-    public $type = '/^(int|string|bool)$/';
+    public $variable = '/^(LF|GF|TF)@([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$/'; /** regular expression for variable */
+    public $symbInt = '/^int@((\+|-)?[0-9]\d*)$/'; /** regular expression for symbol int */
+    public $symbString = '/^string@([^\ \\\\#]|\\\\[0-9]{3})*$/'; /** regular expression for symbol string */
+    public $symbBool = '/^bool@(true|false)$/'; /** regular expression for symbol bool */
+    public $symbNil = '/^nil@nil$/'; /** regular expression for symbol nil */
+    public $label = '/^([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$/';/** regular expression for label*/
+    public $type = '/^(int|string|bool)$/';/** regular expression for type */
     
+    /**
+     * @brief Method parse, this method generate xml, check lexical and syntactic analysis
+     */
     public function parse()
     {
         $xml = new DOMDocument("1.0", "UTF-8"); /*create xml with header 1.0 a UTF-8*/
@@ -129,7 +152,7 @@ class Parser
                     }
                     break;
 /****************** 1 operand <symb>*******************************************/
-                case "PUSH":
+                case "PUSHS":
                 case "WRITE":
                 case "EXIT":
                 case "DPRINT":
@@ -276,6 +299,14 @@ class Parser
         }
         echo $xml->saveXML();
     }
+    /**
+     * @brief Method checkSymbol according to symbol generates xml
+     * @param $splitLineToWord splited line to the word 0 index is a opcodeName 
+     * @param $position is a index position  0 is a opcodename 1 is first operand 2 is second operand etc
+     * @param $xml for xml generation
+     * @param $instruction for xml
+     * @param $i is a arg counter in xml
+     */
     public function checkSymbol($splitLineToWord,$position,$xml,$instruction,$i)
     {
         if(preg_match($this->variable,$splitLineToWord[$position],$match))
@@ -311,7 +342,14 @@ class Parser
             CheckArgumentsAndError::errorMessage("Lexical error",23);
         }
     }
-
+    /**
+     * @brief Method addSymbToXML add symbol to xml
+     * @param $xml for xml generation 
+     * @param $instruction xml element
+     * @param $match match from preg_match
+     * @param $var for identification (int,bool,string,,nil,var)
+     * @param $i arg counter in xml
+     */
     public function addSymbToXML($xml,$instruction,$match,$var,$i)
     {
         $match = preg_replace("/&/","&amp;",$match);
@@ -324,6 +362,13 @@ class Parser
         $argTmp->setAttribute("type",$var);
         $instruction->appendChild($argTmp);
     }
+    /**
+     * @brief Method addVarToXML add var to xml
+     * @param $xml for xml generation 
+     * @param $instruction xml element
+     * @param $match match from preg_match
+     * @param $i arg counter in xml
+     */
     public function addVarToXML($xml,$instruction,$match,$i)
     {
         $match = preg_replace("/&/","&amp;",$match);
@@ -333,6 +378,13 @@ class Parser
         $argTmp->setAttribute("type",$var);
         $instruction->appendChild($argTmp);
     }
+    /**
+     * @brief Method addLabelToXML add label to xml
+     * @param $xml for xml generation 
+     * @param $instruction xml element
+     * @param $match match from preg_match
+     * @param $i arg counter in xml
+     */
     public function addLabelToXML($xml,$instruction,$match,$i)
     {
         $match = preg_replace("/&/","&amp;",$match);
@@ -342,6 +394,13 @@ class Parser
         $argTmp->setAttribute("type",$var);
         $instruction->appendChild($argTmp);
     }
+    /**
+     * @brief Method addTypeToXML add type to xml
+     * @param $xml for xml generation 
+     * @param $instruction xml element
+     * @param $match match from preg_match
+     * @param $i arg counter in xml
+     */
     public function addTypeToXML($xml,$instruction,$match,$i)
     {
         $argTmp = $xml->createElement("arg$i","$match[0]");

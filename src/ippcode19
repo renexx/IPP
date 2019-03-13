@@ -1,30 +1,56 @@
-.IPPcODE19#aaa
+.IPPcODE19      #aaa
 CREATEFRAME
 defvar GF@*?_!cou&nter#totojekoment
 defvar GF@-?!_-
-jump while
+defvar GF@_?!_-
+defvar GF@?!_-
+defvar GF@&?!_-
+defvar GF@!&?!_-
+defvar GF@%&?!_-
+defvar GF@*&?!_-
+defvar GF@$&?!_-
+jump While
 label ?end
-push bool@true
-push int@9
+pushs bool@true
+pushs int@9
+pushs int@+9
+pushs int@-9
+pushs int@000000009
+pushs int@09
+pushs int@+09
 write string@a
-move GF@!?_coun&ter string@šanoZadejte\032obs&ah:aaasauj<e\032Œ™Ѭaletotije>autoavelke_*+"$'aa'
+move GF@!?_coun&ter string@7šano7Zadejte\032obs&ah:aaasauj<e\032Œ™Ѭaletotije>autoavelke_*+"$'aa'
 read GF@operace string
 read LF@haaha int
-add GF@hah int@9 bool@true
-JUMPIFEQ plus bool@true string@aaas
-JUMPIFEQ minus bool@true string@abc
+                                            add GF@hah int@9 bool@true
+                                            
+                                            
+                                            
+#aaa                                            
+            #JUMPIFEQ minus bool@true string@abc
 JUMPIFEQ krat bool@true string@
 JUMPIFEQ deleno bool@true string@c#ca
 WRITE string@Zadejte\032obsahuje\032Œ™Ѭ<
-PUSH nil@nil
-move GF@counter GF@stri&ng
+PUSHs nil@nil
+move GF@string GF@string
 JUMPIFEQ plus GF@string GF@stringaaa
 #aaah
 #aaah
 #aaah
 #aaa
-DEFVAR GF@counter#komentar
+DEFVAR GF@couAnter#komentar
 #ajajajajajja
 #ajajajajajja
 label -?!*$
+label ?!*$
+label !?!*$
+label _?!*$
+label &-?!*$
+label %?!*$
+label $-?!*$
+label *-?!*$
 move LF@counter string@šýáčíáťíčťíčťáčýč@a
+AND GF@hah int@9 bool@true
+and GF@haah int@97 bool@true
+or GF@haah int@97 bool@true
+not GF@haah int@97 bool@true
