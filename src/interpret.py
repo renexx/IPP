@@ -97,6 +97,8 @@ for instruction in root_program:
     if instruction.attrib["opcode"] in ["DEFVAR","POPS"]:
         counter_arg = 0
         for argument in instruction:
+            if "type" not in argument.attrib:
+                errorMessage("Chyba type u DEFVAR,POPS",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("Pri DEFVAR a POPS musi byt var",32)
@@ -111,6 +113,8 @@ for instruction in root_program:
     if instruction.attrib["opcode"] in ["PUSHS","WRITE","EXIT","DPRINT"]:
         counter_arg = 0
         for argument in instruction:
+            if "type" not in argument.attrib:
+                errorMessage("Chyba type u PUSHS, WRITE ,EXIT,DPRINT",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] not in ["int","string","bool","nil","var"]):
                     errorMessage("Pri PUSHS, WRITE, EXIT a DPRINT musi byt bud int, string, bool,nil alebo to moze byt var ",32)
@@ -123,6 +127,8 @@ for instruction in root_program:
     if instruction.attrib["opcode"] in ["CALL","LABEL","JUMP"]:
         counter_arg = 0
         for argument in instruction:
+            if "type" not in argument.attrib:
+                errorMessage("Chyba type u CALL,LABEL,JUMP",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "label"):
                     errorMessage("Pri CALL, LABEL a JUMP musi byt label",32)
@@ -135,6 +141,8 @@ for instruction in root_program:
     if instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN"]:
         counter_arg = 0
         for argument in instruction:
+            if "type" not in argument.attrib:
+                errorMessage("Chyba type u MOVE,INT2CHAR,TYPE,STRLEN",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg1 var",32)
@@ -150,6 +158,8 @@ for instruction in root_program:
     if instruction.attrib["opcode"] in ["READ"]:
         counter_arg = 0
         for argument in instruction:
+            if "type" not in argument.attrib:
+                errorMessage("Chyba type u READ",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("Pri READ musi byt arg1 var",32)
@@ -165,6 +175,8 @@ for instruction in root_program:
     if instruction.attrib["opcode"] in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
         counter_arg = 0
         for argument in instruction:
+            if "type" not in argument.attrib:
+                errorMessage("Chyba type u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR ",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg1 var",32)
@@ -184,6 +196,8 @@ for instruction in root_program:
     if instruction.attrib["opcode"] in ["JUMPIFEQ","JUMPIFNEQ"]:
         counter_arg = 0
         for argument in instruction:
+            if "type" not in argument.attrib:
+                errorMessage("Chyba type u JUMPIFEQ, JUMPIFNEQ ",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "label"):
                     errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg1 label",32)
@@ -203,9 +217,23 @@ for instruction in root_program:
 
 #TODO  zoradit elementy xmlka [DONE]
 root_program[:] = sorted(root_program, key=lambda child: int(child.get("order")))
-
 for child in root_program:
-    child[:] = sorted(child, key =lambda child: child.tag)         
-    #dom.findall(to co chcem najst vsetky mohol by som takto vyhladat a nejakou funkciu zoradit)
-#dom.write("output.xml")
+    child[:] = sorted(child, key =lambda child: child.tag)
+    
+counter_order = 1
+for instruction in root_program:
+    if int(instruction.get("order")) != counter_order:
+        errorMessage("Zly order, order musi zacitat od 1",32)
+# TOTO PRETO ABY NEBOLO PRI DAKEJ INSTRUKCI arg1 arg1##########################        
+    if instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN","READ"]:    
+        if(instruction[0].tag != "arg1" or instruction[1].tag != "arg2"):
+            errorMessage("Zle poradie argumentov u MOVE, INT2CHAR, TYPE, STRLEN, READ",32)
+    if instruction.attrib["opcode"] in ["ADD,SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
+        if(instruction[0].tag != "arg1" or instruction[1].tag != "arg2" or instruction[2].tag != "arg3"):
+            errorMessage("Zle poradie argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)         
+###########################################################################   
+                
+    counter_order += 1
+                     
+#dom.write("example.xml")
 
