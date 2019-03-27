@@ -78,6 +78,7 @@ if len(root_program.attrib) == 3:
 for instruction in root_program:
     if(instruction.tag != "instruction"):
         errorMessage("Missing instruction element",32)
+  
     if(len(instruction.attrib) != 2):
         errorMessage("zly pocet atributov",32)
     else:
@@ -92,14 +93,111 @@ for instruction in root_program:
             if(argument.tag != 0):
                 errorMessage("zly pocet argumentov u CREATEFRAME,PUSHFRAME,POPFRAME,RETURN,BREAK",32)
 ###################################################################################################################                
-# 1 operand DEFVAR, POPS
-    if instruction.attrib["opcode"] in  ["DEFVAR","POPS"]:
-        
-            
-
-
-
-
+# 1 operand  [var]  DEFVAR, POPS TODO ked mas v instukci arg1 arg1
+    if instruction.attrib["opcode"] in ["DEFVAR","POPS"]:
+        counter_arg = 0
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "var"):
+                    errorMessage("Pri DEFVAR a POPS musi byt var",32)
+            else:
+                errorMessage("Zly argument u DEFVAR,POPS",32)
+            counter_arg += 1
+        if(counter_arg != 1):
+            errorMessage("Zly pocet argumentov u DEFVAR,POPS",32)            
+                #print(argument.attrib)    #toto je type var
+            #print(argument.tag)  # arg1
+# 1 operand [symb] = int, string, bool, nil PUSHS, WRITE,EXIT,DPRINT
+    if instruction.attrib["opcode"] in ["PUSHS","WRITE","EXIT","DPRINT"]:
+        counter_arg = 0
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] not in ["int","string","bool","nil","var"]):
+                    errorMessage("Pri PUSHS, WRITE, EXIT a DPRINT musi byt bud int, string, bool,nil alebo to moze byt var ",32)
+            else:
+                errorMessage("Zly argument u PUSHS, WRITE ,EXIT,DPRINT",32)
+            counter_arg += 1
+        if(counter_arg != 1):
+            errorMessage("Zly pcoet argumentov u PUSH,WRITE,EXIT,DPRINT",32)             
+# 1 operand [label] CALL, LABEL, JUMP
+    if instruction.attrib["opcode"] in ["CALL","LABEL","JUMP"]:
+        counter_arg = 0
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "label"):
+                    errorMessage("Pri CALL, LABEL a JUMP musi byt label",32)
+            else:
+                errorMessage("Zly argument u CALL LABEl A JUMP",32)
+            counter_arg +=1
+        if(counter_arg != 1):
+            errorMessage("Zly pocet argumentov u CALL LABEL A JUMP",32)          
+# 2 operandy [var][symb]-int,string,bool,nil MOVE,INT2CHAR,TYPE,STRLEN
+    if instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN"]:
+        counter_arg = 0
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "var"):
+                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg1 var",32)
+            elif(argument.tag == "arg2"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg2 int,string,bool,nil alebo to moze byt var",32)
+            else:
+                errorMessage("Zle argumenty u MOVE,INT2CHAR,TYPE,STRLEN",32)
+            counter_arg += 1
+        if(counter_arg != 2):
+            errorMessage("Zly pocet argumentov u MOVE,INT2CHAR,TYPE,STRLEN",32)                        
+# 2 operandy [var][type] READ
+    if instruction.attrib["opcode"] in ["READ"]:
+        counter_arg = 0
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "var"):
+                    errorMessage("Pri READ musi byt arg1 var",32)
+            elif(argument.tag == "arg2"):
+                if(argument.attrib["type"] != "type"):
+                    errorMessage("Pri READ musi byt arg2 type",32)
+            else:
+                errorMessage("Zle argumenty u READ",32)
+            counter_arg +=1
+        if(counter_arg != 2):
+            errorMessage("Zly pocet argumentov u READ",32)
+#3 operandy [var] [symb1] [symb2] symbol moze byt var, int, string, bool, nil ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR
+    if instruction.attrib["opcode"] in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
+        counter_arg = 0
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "var"):
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg1 var",32)
+            elif(argument.tag == "arg2"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg2 int,string,bool,nil,var",32)
+            elif(argument.tag == "arg3"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg3 int,string,bool,nil,var",32)                                                
+            else:
+                errorMessage("Zle argumenty u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)
+            counter_arg += 1
+        if(counter_arg != 3):
+            errorMessage("Zly pocet argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32) 
+                  
+#3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ              
+    if instruction.attrib["opcode"] in ["JUMPIFEQ","JUMPIFNEQ"]:
+        counter_arg = 0
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "label"):
+                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg1 label",32)
+            elif(argument.tag == "arg2"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg2 int,string,bool,nil,var",32)
+            elif(argument.tag == "arg3"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg3 int,string,bool,nil,var",32)                                                
+            else:
+                errorMessage("Zle argumenty u JUMPIFEQ a JUMPIFNEQ",32)
+            counter_arg += 1
+        if(counter_arg != 3):
+            errorMessage("Zly pocet argumentov u JUMPIFEQ a JUMPIFNEQ",32) 
 
 
 
@@ -109,5 +207,5 @@ root_program[:] = sorted(root_program, key=lambda child: int(child.get("order"))
 for child in root_program:
     child[:] = sorted(child, key =lambda child: child.tag)         
     #dom.findall(to co chcem najst vsetky mohol by som takto vyhladat a nejakou funkciu zoradit)
-
+#dom.write("output.xml")
 
