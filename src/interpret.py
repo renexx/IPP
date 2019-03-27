@@ -52,28 +52,62 @@ except OSError as error:
 except ElementTree.ParseError as error:
     errorMessage(error.args[0],31) #ked nieje well formated
 
-root = dom.getroot()#root program
+root_program = dom.getroot()#root program
 
-if(root.tag != "program"):
+if(root_program.tag != "program"):
     errorMessage("In XML is wrong root tag use --help",32)
 
-if len(root.attrib) > 3:
+if len(root_program.attrib) > 3:
     errorMessage("Many arguments",32)
     
-if "language" in root.attrib:   
-    if root.attrib["language"] != "IPPcode19":
+if "language" in root_program.attrib:   
+    if root_program.attrib["language"] != "IPPcode19":
         errorMessage("Missing header IPPcode19",32)
 else:
     errorMessage("Missing element language",32)        
-if len(root.attrib) == 2:
-    if "description" not in root.attrib  and "name" not in root.attrib:
+if len(root_program.attrib) == 2:
+    if "description" not in root_program.attrib  and "name" not in root_program.attrib:
         errorMessage("Wrong attributes in xml",32)   
-if len(root.attrib) == 3:
-    if "description" not in root.attrib  or "name" not in root.attrib:        
+if len(root_program.attrib) == 3:
+    if "description" not in root_program.attrib  or "name" not in root_program.attrib:        
         errorMessage("Wrong attributes in xml",32)   
     
-    
-    
+
+#TODO analyza xml
+#KONTROLA ELEMENTU instruction či tam je a či obsahuje opcode a order
+for instruction in root_program:
+    if(instruction.tag != "instruction"):
+        errorMessage("Missing instruction element",32)
+    if(len(instruction.attrib) != 2):
+        errorMessage("zly pocet atributov",32)
+    else:
+        if "order" not in instruction.attrib or "opcode" not in instruction.attrib:
+            errorMessage("chyba order alebo opcode",32)
+###################################################################################
+#KONTROLA JEDNOTLIVYCH opcode
+# ZACNEME tymi čo maju 0 operandov
+# 0 operandov CREATEFRAME PUSHFRAME POPFRAME RETURN break
+    if instruction.attrib["opcode"] in ["CREATEFRAME","PUSHFRAME","POPFRAME","RETURN","BREAK"]: #something like switch
+        for argument in instruction:
+            if(argument.tag != 0):
+                errorMessage("zly pocet argumentov u CREATEFRAME,PUSHFRAME,POPFRAME,RETURN,BREAK",32)
+###################################################################################################################                
+# 1 operand DEFVAR, POPS
+    if instruction.attrib["opcode"] in  ["DEFVAR","POPS"]:
+        
+            
+
+
+
+
+
+
+
+#TODO  zoradit elementy xmlka [DONE]
+root_program[:] = sorted(root_program, key=lambda child: int(child.get("order")))
+
+for child in root_program:
+    child[:] = sorted(child, key =lambda child: child.tag)         
     #dom.findall(to co chcem najst vsetky mohol by som takto vyhladat a nejakou funkciu zoradit)
 
 
