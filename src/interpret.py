@@ -94,7 +94,7 @@ for instruction in root_program:
                 errorMessage("zly pocet argumentov u CREATEFRAME,PUSHFRAME,POPFRAME,RETURN,BREAK",32)
 ###################################################################################################################                
 # 1 operand  [var]  DEFVAR, POPS TODO ked mas v instukci arg1 arg1
-    if instruction.attrib["opcode"] in ["DEFVAR","POPS"]:
+    elif instruction.attrib["opcode"] in ["DEFVAR","POPS"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -110,7 +110,7 @@ for instruction in root_program:
                 #print(argument.attrib)    #toto je type var
             #print(argument.tag)  # arg1
 # 1 operand [symb] = int, string, bool, nil PUSHS, WRITE,EXIT,DPRINT
-    if instruction.attrib["opcode"] in ["PUSHS","WRITE","EXIT","DPRINT"]:
+    elif instruction.attrib["opcode"] in ["PUSHS","WRITE","EXIT","DPRINT"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -124,7 +124,7 @@ for instruction in root_program:
         if(counter_arg != 1):
             errorMessage("Zly pcoet argumentov u PUSH,WRITE,EXIT,DPRINT",32)             
 # 1 operand [label] CALL, LABEL, JUMP
-    if instruction.attrib["opcode"] in ["CALL","LABEL","JUMP"]:
+    elif instruction.attrib["opcode"] in ["CALL","LABEL","JUMP"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -138,7 +138,7 @@ for instruction in root_program:
         if(counter_arg != 1):
             errorMessage("Zly pocet argumentov u CALL LABEL A JUMP",32)          
 # 2 operandy [var][symb]-int,string,bool,nil MOVE,INT2CHAR,TYPE,STRLEN
-    if instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN"]:
+    elif instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -155,7 +155,7 @@ for instruction in root_program:
         if(counter_arg != 2):
             errorMessage("Zly pocet argumentov u MOVE,INT2CHAR,TYPE,STRLEN",32)                        
 # 2 operandy [var][type] READ
-    if instruction.attrib["opcode"] in ["READ"]:
+    elif instruction.attrib["opcode"] in ["READ"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -172,7 +172,7 @@ for instruction in root_program:
         if(counter_arg != 2):
             errorMessage("Zly pocet argumentov u READ",32)
 #3 operandy [var] [symb1] [symb2] symbol moze byt var, int, string, bool, nil ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR
-    if instruction.attrib["opcode"] in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
+    elif instruction.attrib["opcode"] in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -193,7 +193,7 @@ for instruction in root_program:
             errorMessage("Zly pocet argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32) 
                   
 #3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ              
-    if instruction.attrib["opcode"] in ["JUMPIFEQ","JUMPIFNEQ"]:
+    elif instruction.attrib["opcode"] in ["JUMPIFEQ","JUMPIFNEQ"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -212,7 +212,8 @@ for instruction in root_program:
             counter_arg += 1
         if(counter_arg != 3):
             errorMessage("Zly pocet argumentov u JUMPIFEQ a JUMPIFNEQ",32) 
-
+    else:
+        errorMessage("Neznamy operacny kod",32)
 
 
 #TODO  zoradit elementy xmlka [DONE]
@@ -234,6 +235,59 @@ for instruction in root_program:
 ###########################################################################   
                 
     counter_order += 1
-                     
+    reg_variable = "^(LF|GF|TF)@([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$"
+    reg_symb_int = "^((\+|-)?[0-9]\d*)$"
+    reg_symb_string = "([^\ \\\\#]|\\\\[0-9]{3})*$"
+    reg_symb_bool = "^(true|false)$/"
+    reg_symb_nil = '^nil@nil$/'; /** regular expression for symbol nil */
+    reg_label = "^([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$"
+    reg_type = "^(int|string|bool)$"
+    
+    for instruction in root_program:
+        if instruction.attrib["opcode"] 
+    #GF = {}
+    #TF = None
+    #LF = []
+    #for instruction in root_program:
+    #    variable = instruction[0].text
+#        variable_splited = variable.split("@",1)
+#        frame = variable_splited[0]
+        #if(frame == "GF"):
+            #        variable_value = variable_splited[1]
+            #G#F[variable_value] = [instruction[0].attrib["type"],instruction[0].text]
+        #    print(GF)
+    #    else:
+    #        errorMessage("nejaky semanticky erro premena aj cislo",32)
+    #    if(frame == "TF"):
+    #        if(TF == None):
+    #            errorMessage("neni dksmds",32)
+    #        else:    
+    #            TF[variable_value] = [instruction[0].attrib["type"],instruction[0].text]
+    #    if(frame == "LF"):
+    #        if(LF):
+    #            LF[(-1)variable_value] = [instruction[0].attrib["type"],instruction[0].text]
+    #        else:
+    #            errorMessage("aaasaa",32)                    
+
+# 
+                
+#LF je prblem cely zasobnik ramcu
+#urobime si zasobnik Listom
+#LF = []
+
+
+#if(ramec == "LF"):
+#    if LF:
+#        LF[(-1)nazov_value] = [instrukce[1].attrib["type"].instrukcie[1].text]
+#    else:
+#        print chyba    
+#je to list a ked pride pushframe tak do toho listu 
+#LF.append({}) pridame do neho slovnik
+#if LF:
+#    LF.pop() ak nepojde pushframe ak tam insensitive mozne sa stat ze tam bude popframe
+                
+#ak pride CREATEFRAME
+#TF= {}
+               
 #dom.write("example.xml")
 
