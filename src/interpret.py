@@ -2,7 +2,7 @@
 #
 # Project: Project for Principles of Programming Languages subject
 # @file interpret.php
-# autor René Bolf
+# autor René Bolf xbolfr00@stud.fit.vutbr.cz
 import sys
 import xml.etree.ElementTree as ElementTree
 import re
@@ -71,8 +71,54 @@ if len(root_program.attrib) == 2:
 if len(root_program.attrib) == 3:
     if "description" not in root_program.attrib  or "name" not in root_program.attrib:        
         errorMessage("Wrong attributes in xml",32)   
-    
 
+reg_variable = "^(LF|GF|TF)@([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$"
+reg_label = "^([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$"
+reg_type = "^(int|string|bool)$"    
+
+def symbolCheck(attribType,operand):
+    if(attribType == "int"):
+        check_symbolint = re.search("^((\+|-)?[0-9]\d*)$",operand)
+        if not check_symbolint:
+            errorMessage("Zle zapisany typ: int",32)
+    elif(attribType == "string"):
+        check_symbolstring = re.search("([^\ \\\\#]|\\\\[0-9]{3})*$",operand)
+        if not check_symbolstring:
+            errorMessage("Zle zapisany typ: string",32)
+    elif(attribType == "bool"):
+        check_symbolbool = re.search("^(true|false)$",operand)
+        if not check_symbolbool:
+            errorMessage("Zle zapisany typ: bool",32)
+    elif(attribType == "nil"):
+        check_symbolnil =  re.search("^nil$",operand) 
+        if not check_symbolnil:
+            errorMessage("Zle zapisany typ: nil",32)
+    elif(attribType == "var"):
+        check_var = re.search("^(LF|GF|TF)@([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$",operand)
+        if not check_var:
+            errorMessage("Zle zapisany typ: var",32)
+    else:
+        errorMessage("chybny symbol",32) 
+        
+def variableCheck(attribType,operand):
+    if(attribType == "var"):
+        check_var = re.search("^(LF|GF|TF)@([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$",operand)
+        if not check_var:
+            errorMessage("Zle zapisany typ: var",32)
+            
+def labelCheck(attribType,operand):
+    if(attribType == "label"):
+        check_label = re.search("^([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$",operand)
+        if not check_label:
+            errorMessage("Zle zapisany typ: label",32)
+            
+def typeCheck(attribType,operand):
+    if(attribType == "type"):
+        check_type = re.search("^(int|string|bool)$",operand)
+        if not check_type:
+            errorMessage("Zle napisany typ: type",32)
+    
+    
 #TODO analyza xml
 #KONTROLA ELEMENTU instruction či tam je a či obsahuje opcode a order
 for instruction in root_program:
@@ -102,6 +148,8 @@ for instruction in root_program:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("Pri DEFVAR a POPS musi byt var",32)
+                else:    
+                    variableCheck(argument.attrib["type"],argument.text)
             else:
                 errorMessage("Zly argument u DEFVAR,POPS",32)
             counter_arg += 1
@@ -116,8 +164,10 @@ for instruction in root_program:
             if "type" not in argument.attrib:
                 errorMessage("Chyba type u PUSHS, WRITE ,EXIT,DPRINT",32)
             if(argument.tag == "arg1"):
-                if(argument.attrib["type"] not in ["int","string","bool","nil","var"]):
-                    errorMessage("Pri PUSHS, WRITE, EXIT a DPRINT musi byt bud int, string, bool,nil alebo to moze byt var ",32)
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri PUSHS, WRITE, EXIT a DPRINT musi byt bud int, string, bool,nil alebo to moze byt var ",32)                                       
+                else:    
+                    symbolCheck(argument.attrib["type"],argument.text)
             else:
                 errorMessage("Zly argument u PUSHS, WRITE ,EXIT,DPRINT",32)
             counter_arg += 1
@@ -132,6 +182,8 @@ for instruction in root_program:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "label"):
                     errorMessage("Pri CALL, LABEL a JUMP musi byt label",32)
+                else:
+                    labelCheck(argument.attrib["type"],argument.text)    
             else:
                 errorMessage("Zly argument u CALL LABEl A JUMP",32)
             counter_arg +=1
@@ -146,9 +198,13 @@ for instruction in root_program:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg1 var",32)
+                else:
+                    variableCheck(argument.attrib["type"],argument.text)
             elif(argument.tag == "arg2"):
                 if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
                     errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg2 int,string,bool,nil alebo to moze byt var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)    
             else:
                 errorMessage("Zle argumenty u MOVE,INT2CHAR,TYPE,STRLEN",32)
             counter_arg += 1
@@ -163,9 +219,13 @@ for instruction in root_program:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("Pri READ musi byt arg1 var",32)
+                else:
+                    variableCheck(argument.attrib["type"],argument.text)    
             elif(argument.tag == "arg2"):
                 if(argument.attrib["type"] != "type"):
                     errorMessage("Pri READ musi byt arg2 type",32)
+                else:
+                    typeCheck(argument.attrib["type"],argument.text)    
             else:
                 errorMessage("Zle argumenty u READ",32)
             counter_arg +=1
@@ -180,19 +240,25 @@ for instruction in root_program:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg1 var",32)
+                else:
+                    variableCheck(argument.attrib["type"],argument.text)    
             elif(argument.tag == "arg2"):
                 if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
                     errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg2 int,string,bool,nil,var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)    
             elif(argument.tag == "arg3"):
                 if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg3 int,string,bool,nil,var",32)                                                
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg3 int,string,bool,nil,var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)                                                    
             else:
                 errorMessage("Zle argumenty u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)
             counter_arg += 1
         if(counter_arg != 3):
             errorMessage("Zly pocet argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32) 
                   
-#3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ              
+#3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ    TODO <arg3 type="string" />          
     elif instruction.attrib["opcode"] in ["JUMPIFEQ","JUMPIFNEQ"]:
         counter_arg = 0
         for argument in instruction:
@@ -201,12 +267,18 @@ for instruction in root_program:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "label"):
                     errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg1 label",32)
+                else:
+                    labelCheck(argument.attrib["type"],argument.text)    
             elif(argument.tag == "arg2"):
                 if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
                     errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg2 int,string,bool,nil,var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)    
             elif(argument.tag == "arg3"):
                 if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg3 int,string,bool,nil,var",32)                                                
+                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg3 int,string,bool,nil,var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)                                                    
             else:
                 errorMessage("Zle argumenty u JUMPIFEQ a JUMPIFNEQ",32)
             counter_arg += 1
@@ -235,16 +307,10 @@ for instruction in root_program:
 ###########################################################################   
                 
     counter_order += 1
-    reg_variable = "^(LF|GF|TF)@([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$"
-    reg_symb_int = "^((\+|-)?[0-9]\d*)$"
-    reg_symb_string = "([^\ \\\\#]|\\\\[0-9]{3})*$"
-    reg_symb_bool = "^(true|false)$/"
-    reg_symb_nil = '^nil@nil$/'; /** regular expression for symbol nil */
-    reg_label = "^([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$"
-    reg_type = "^(int|string|bool)$"
     
-    for instruction in root_program:
-        if instruction.attrib["opcode"] 
+    
+    #for instruction in root_program:
+    #    if instruction.attrib["opcode"] 
     #GF = {}
     #TF = None
     #LF = []
