@@ -308,7 +308,162 @@ for instruction in root_program:
                 
     counter_order += 1
     
+class frames:    
+    GF = {} # vytvorenie slovnika pre GF ramec teda globalny ramec
+    TF = None # temporary frame si nastavíme zatial na none čiže neni defined
+    LF = None
+    stack = []
     
+    for instruction in root_program:
+    #    if instruction.attrib["opcode"] == "MOVE":
+    #        variable = instruction[0].text
+    #        type  = instruction[0].attrib
+    #        variable_splited = variable.split("@",1)
+    #        frame = variable_splited[0] # nazov frame
+    #        variable_value = variable_splited[1] #hodnota 
+    #        if frame not in ["GF","TF","LF"]:
+    #            errorMessage("Neznamy typ frame treba upravit navratovy kod ",32)
+    #        if(frame == "GF"):
+    #            GF[variable_value]=[type,variable] # instruction[0].attrib = arg1 type 
+    #            print(GF)
+    #            print("\n")
+    #         #kontrola či tam neni uz dvakrat
+    #         if variable_value in frame:
+    #             errorMessage("Premenna uz existuje v globalnom ramci",32)
+                 
+        if instruction.attrib["opcode"] == "ADD":
+            #print(instruction[0].text)
+            print("ADD")
+            print(instruction[1].text)
+            print(instruction[2].text)
+            instruction[0].text = int(instruction[1].text) + int(instruction[2].text)
+            print(instruction[0].text)
+            print("\n")
+        elif instruction.attrib["opcode"] == "SUB":
+            print("SUB")
+            print(instruction[1].text)
+            print(instruction[2].text)
+            instruction[0].text = int(instruction[1].text) - int(instruction[2].text)     
+            print(instruction[0].text)
+            print("\n")
+        elif instruction.attrib["opcode"] == "MUL":
+            print("MUL")
+            print(instruction[1].text)
+            print(instruction[2].text)
+            instruction[0].text = int(instruction[1].text) * int(instruction[2].text)     
+            print(instruction[0].text)   
+            print("\n")
+        elif instruction.attrib["opcode"] == "IDIV":
+            print("IDIV")
+            print(instruction[1].text)
+            print(instruction[2].text)
+            if int(instruction[2].text) == 0 :
+                errorMessage("Delenie 0 u IDIV",32)    
+            else:
+                instruction[0].text = int(instruction[1].text) // int(instruction[2].text)     
+                print(instruction[0].text)   
+                print("\n")
+        elif instruction.attrib["opcode"] in ["LT","GT","EQ"]:
+                print(instruction[1].text)
+                print(instruction[2].text)
+                if instruction[1].attrib["type"] != instruction[2].attrib["type"]:        
+                    errorMessage("nekopatibilne typy",32)
+                else:
+                    if instruction.attrib["opcode"] in ["LT","GT"]:    
+                        if instruction[1].attrib["type"] == "nil" or instruction[2].attrib["type"] == "nil":
+                            errorMessage("nemozno porovnavat pri LT a EQ nil",53)
+                        else:    
+                            if instruction.attrib["opcode"] == "LT":    
+                                print("LT")
+                                instruction[0].text = instruction[1].text > instruction[2].text     
+                                print(instruction[0].text)   
+                                print("\n")
+                            elif instruction.attrib["opcode"] == "GT":
+                                print("GT")
+                                instruction[0].text = instruction[1].text < instruction[2].text     
+                                print(instruction[0].text)   
+                                print("\n")
+                    elif instruction.attrib["opcode"] == "EQ":
+                        print("EQ")
+                        instruction[0].text = instruction[1].text == instruction[2].text     
+                        print(instruction[0].text)   
+                        print("\n")    
+        elif instruction.attrib["opcode"] == "AND":
+                print("AND")
+                print(instruction[1].text)
+                print(instruction[2].text)
+                instruction[0].text = bool(instruction[1].text) and bool(instruction[2].text)
+                print(instruction[0].text)
+                print("\n")
+        elif instruction.attrib["opcode"] == "OR":
+                print("OR")
+                print(instruction[1].text)
+                print(instruction[2].text)
+                instruction[0].text = bool(instruction[1].text) or bool(instruction[2].text)
+                print(instruction[0].text)
+                print("\n")        
+        elif instruction.attrib["opcode"] == "NOT":
+                print("NOT")
+                print(instruction[1].text)
+                print(instruction[2].text)
+                instruction[0].text = not bool(instruction[1].text)
+                print(instruction[0].text)
+                print("\n")        
+        elif instruction.attrib["opcode"] == "INT2CHAR":
+            print("INT2CHAR")
+            print(instruction[1].text)
+            value = int(instruction[1].text)
+            try:
+                instruction[0].text = chr(value)
+            except ValueError as error:
+                errorMessage(error.args[0],58)
+            print(instruction[0].text) 
+        #elif instruction.attrib["opcode"] == "STRI2INT":
+        #    print("STRI2INT")
+        #    print(instruction[1].text)
+        #    value = int(instruction[1].text)
+        #    if instruction[1].attrib["type"] == "string" and instruction[2].attrib["type"] == "int":
+                #if 0 <= int(instruction[2].text) < len(instruction[1].text):
+        #        instruction[0].text = ord(instruction[1].text[int(instruction[2].text)])
+        #        print(instruction[0].text)
+        #    else:
+        #        errorMessage("mimo rozsah",58)    
+        elif instruction.attrib["opcode"] == "EXIT":
+               if instruction[0].attrib["type"] == "int":
+                   if 0 <= int(instruction[0].text) <= 49:
+                       sys.exit(int(instruction[0].text))
+                   else:
+                       errorMessage("Spatna ciselna hodnota instrukcie EXIT",57)
+               else:
+                   errorMessage("EXIT musi byt int",32)    
+        #elif instruction.attrib["opcode"] == "MOVE":
+        elif instruction.attrib["opcode"] == "CONCAT": # <var> <symb1> <symb2>
+              if instruction[1].attrib["type"] != "string" or instruction[2].attrib["type"] != "string":
+                  errorMessage("pri CONCAT musi byt symb1 aj symb2 type: string",32)     
+              else:
+                 print("CONCAT")
+                 print(instruction[1].text)
+                 print(instruction[2].text)
+                 instruction[0].text = instruction[1].text + instruction[2].text
+                 print(instruction[0].text)
+                 print("\n")
+        elif instruction.attrib["opcode"] == "STRLEN":
+            if instruction[1].attrib["type"] != "string":
+                errorMessage("Zly typ pri STRLEN, symb1 musi byt string",32)
+            else:
+                print("STRLEN")
+                print(instruction[1].text)            
+                instruction[0].text = int(len(instruction[1].text))   
+                print(instruction[0].text) 
+                print("\n")  
+              
+        
+                
+                    
+                            
+                                           
+            
+                    
     #for instruction in root_program:
     #    if instruction.attrib["opcode"] 
     #GF = {}
