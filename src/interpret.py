@@ -315,8 +315,69 @@ class frames:
     stack = []
 
     @classmethod
-    def addToFrame():
-        
+    def addToFrame(self,variableName):
+        frame = self.identifFrame(frameName)
+        variableName = variableName.split("@",1)
+        variableName = variableName[1]
+        if variableName in frame:
+            errorMessage("Variable uz existuje v globalnom frame",32)
+        frame[variableName] = None
+    @classmethod      
+    def setVarToFrame(self,variableName,value):
+        frame = self.identifFrame(frameName)
+        variableName = variableName.split("@",1)
+        variableName = variableName[1]
+        if variableName not in frame:
+            errorMessage("Nemozno nastavit neexistujucu variable",32)
+        #get actual Value
+        if type(value) == var:
+            values = value.getValue()          
+        frame[name] = value;    
+    
+    def getVarToFrame():
+        pass
+    
+    @classmethod
+    def splitFramePrefix():
+        pass
+    @classmethod
+    def identifFrame(self,frameName):
+        for instruction in root_program:
+            variable = instruction[0].text #toto je nejaky text napriklad ked je var GF@daco
+            variable_splited = variable.split("@",1)
+            frameName = variable_splited[0]
+            
+        if frameName == "GF":
+            frame = self.GF
+        elif frameName == "LF":
+            frame = self.LF
+        elif frameName == "TF":
+            frame = self.TF 
+        else:
+            errorMessage("Neznamy frame prefix",32) 
+            
+        if frame == None:
+            errorMessage("Neinicializovany frame",32)
+        return frame
+                                           
+    
+            #if(frame == "GF"):
+                #        variable_value = variable_splited[1]
+                #G#F[variable_value] = [instruction[0].attrib["type"],instruction[0].text]
+            #    print(GF)
+        #    else:
+        #        errorMessage("nejaky semanticky erro premena aj cislo",32)
+        #    if(frame == "TF"):
+        #        if(TF == None):
+        #            errorMessage("neni dksmds",32)
+        #        else:    
+        #            TF[variable_value] = [instruction[0].attrib["type"],instruction[0].text]
+        #    if(frame == "LF"):
+        #        if(LF):
+        #            LF[(-1)variable_value] = [instruction[0].attrib["type"],instruction[0].text]
+        #        else:
+        #            errorMessage("aaasaa",32)   
+            
 
 
     
@@ -472,29 +533,29 @@ class frames:
                         errorMessage("Mimo rozsah u GETCHAR",58)
                 else:
                      errorMessage("zle zadane typy pri GETCHAR, symb1 ma byt string, symb2 : int",32)
-        #elif instruction.attrib["opcode"] == "TYPE": # <var> <symb>
-        #    print("TYPE")
-        #    print(instruction[1].text)
-            #typeint = int(instruction[1].text)
-            #ypeint = type(typeint)
-            #typebool = bool(instruction[1].text)   
-            #typebool = type(typebool)
-            #typestring = type(typestring)
-        #    bool = bool(instruction[1].text)
-        #    typ = instruction[1].text
-        #    print(type(int(typ)))
-        #    if type(int(typ)) is int:
-        #        instruction[0].text = "int"
-        #        print(instruction[0].text)                
-        #    elif type(bool) is bool:
-        #         instruction[0].text = "bool"
-        #         print(instruction[0].text) 
-        #    elif type(typ) is str:
-        #         typ = "string"
-        #         instruction[0].text = typ
-        #         print(instruction[0].text)   
-        #    else:
-        #        errorMessage("zly typ",32)     
+        elif instruction.attrib["opcode"] == "TYPE": # <var> <symb>
+            print("TYPE")
+            print(instruction[1].text)
+            
+            
+            
+            
+            boola = instruction[1].text
+            print(type(boola))
+            #typ = instruction[1].text
+            
+            #if type(int(typ)) is int:
+            #    instruction[0].text = "int"
+            #    print(instruction[0].text)                
+            #elif type(bool) is bool:
+            #    instruction[0].text = "bool"
+            #    print(instruction[0].text) 
+            #elif type(typ) is str:
+            #     typ = "string"
+            #     instruction[0].text = typ
+            #     print(instruction[0].text)   
+            #else:
+            #    errorMessage("zly typ",32)     
 
                 
         elif instruction.attrib["opcode"] == "DPRINT":
