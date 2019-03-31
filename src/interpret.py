@@ -313,24 +313,14 @@ class frames:
     TF = None # temporary frame si nastavíme zatial na none čiže neni defined
     LF = None
     stack = []
+
+    @classmethod
+    def addToFrame():
+        
+
+
     
     for instruction in root_program:
-    #    if instruction.attrib["opcode"] == "MOVE":
-    #        variable = instruction[0].text
-    #        type  = instruction[0].attrib
-    #        variable_splited = variable.split("@",1)
-    #        frame = variable_splited[0] # nazov frame
-    #        variable_value = variable_splited[1] #hodnota 
-    #        if frame not in ["GF","TF","LF"]:
-    #            errorMessage("Neznamy typ frame treba upravit navratovy kod ",32)
-    #        if(frame == "GF"):
-    #            GF[variable_value]=[type,variable] # instruction[0].attrib = arg1 type 
-    #            print(GF)
-    #            print("\n")
-    #         #kontrola či tam neni uz dvakrat
-    #         if variable_value in frame:
-    #             errorMessage("Premenna uz existuje v globalnom ramci",32)
-                 
         if instruction.attrib["opcode"] == "ADD":
             #print(instruction[0].text)
             print("ADD")
@@ -417,17 +407,27 @@ class frames:
                 instruction[0].text = chr(value)
             except ValueError as error:
                 errorMessage(error.args[0],58)
-            print(instruction[0].text) 
-        #elif instruction.attrib["opcode"] == "STRI2INT":
-        #    print("STRI2INT")
-        #    print(instruction[1].text)
-        #    value = int(instruction[1].text)
-        #    if instruction[1].attrib["type"] == "string" and instruction[2].attrib["type"] == "int":
-                #if 0 <= int(instruction[2].text) < len(instruction[1].text):
-        #        instruction[0].text = ord(instruction[1].text[int(instruction[2].text)])
-        #        print(instruction[0].text)
-        #    else:
-        #        errorMessage("mimo rozsah",58)    
+            print(instruction[0].text)
+            
+        elif instruction.attrib["opcode"] == "STRI2INT":
+            print("STRI2INT")
+            print(instruction[0].text)
+            print(instruction[1].text)
+            print(instruction[2].text)
+            if instruction[1].attrib["type"] == "string" and instruction[2].attrib["type"] == "int":
+                stringValue = instruction[1].text
+                intValue = int(instruction[2].text)
+                varValue = instruction[0].text
+                if 0 <= intValue < len(stringValue):
+                    ordasci = [ord(c) for c in stringValue]
+                    varValue = ordasci[intValue]
+                    print(varValue)
+                    print("\n")
+                else:
+                    errorMessage("Mimo rozsah u SETCHAR",58) 
+            else:
+                errorMessage("Zle zadane typy pri STRI2INT",32)           
+                
         elif instruction.attrib["opcode"] == "EXIT":
                if instruction[0].attrib["type"] == "int":
                    if 0 <= int(instruction[0].text) <= 49:
@@ -436,7 +436,7 @@ class frames:
                        errorMessage("Spatna ciselna hodnota instrukcie EXIT",57)
                else:
                    errorMessage("EXIT musi byt int",32)    
-        #elif instruction.attrib["opcode"] == "MOVE":
+
         elif instruction.attrib["opcode"] == "CONCAT": # <var> <symb1> <symb2>
               if instruction[1].attrib["type"] != "string" or instruction[2].attrib["type"] != "string":
                   errorMessage("pri CONCAT musi byt symb1 aj symb2 type: string",32)     
@@ -456,12 +456,110 @@ class frames:
                 instruction[0].text = int(len(instruction[1].text))   
                 print(instruction[0].text) 
                 print("\n")  
-              
-        
+        elif instruction.attrib["opcode"] == "GETCHAR":
+                print("GETCHAR")
+                print(instruction[1].text)
+                print(instruction[2].text)    
+                if instruction[1].attrib["type"] == "string" and instruction[2].attrib["type"] == "int":
+                    stringValue = instruction[1].text
+                    intValue = int(instruction[2].text)
+                    varValue = instruction[0].text
+                    if 0 <= intValue < len(stringValue):
+                        listStringvalue = list(stringValue)
+                        varValue = listStringvalue[intValue]
+                        print(varValue)
+                    else:
+                        errorMessage("Mimo rozsah u GETCHAR",58)
+                else:
+                     errorMessage("zle zadane typy pri GETCHAR, symb1 ma byt string, symb2 : int",32)
+        #elif instruction.attrib["opcode"] == "TYPE": # <var> <symb>
+        #    print("TYPE")
+        #    print(instruction[1].text)
+            #typeint = int(instruction[1].text)
+            #ypeint = type(typeint)
+            #typebool = bool(instruction[1].text)   
+            #typebool = type(typebool)
+            #typestring = type(typestring)
+        #    bool = bool(instruction[1].text)
+        #    typ = instruction[1].text
+        #    print(type(int(typ)))
+        #    if type(int(typ)) is int:
+        #        instruction[0].text = "int"
+        #        print(instruction[0].text)                
+        #    elif type(bool) is bool:
+        #         instruction[0].text = "bool"
+        #         print(instruction[0].text) 
+        #    elif type(typ) is str:
+        #         typ = "string"
+        #         instruction[0].text = typ
+        #         print(instruction[0].text)   
+        #    else:
+        #        errorMessage("zly typ",32)     
+
                 
-                    
-                            
-                                           
+        elif instruction.attrib["opcode"] == "DPRINT":
+            print("DPRINT")
+            if instruction[0].attrib["type"] == "string":
+                sys.stderr.write(instruction[0].text)
+            elif instruction[0].attrib["type"] == "bool":
+                if instruction[0].text == "false":
+                   sys.stderr.write(instruction[0].text)
+                else:
+                    sys.stderr.write(instruction[0].text)
+            elif instruction[0].attrib["type"] == "int":
+                sys.stderr.write(instruction[0].text)
+            elif instruction[0].attrib["type"] == "var":
+                var = instruction[0].text
+                var_sp = var.split("@",1)
+                sys.stderr.write(var_sp[1])
+        #elif instruction.attrib["opcode"] == "BREAK":TODO
+        #elif instruction.attrib["opcode"] == "MOVE": #<var> <symb>TODO
+        #elif instruction.attrib["opcode"] == "CREATEFRAME":TODO
+        #elif instruction.attrib["opcde"] == "PUSHFRAME":     TODO                  
+        #elif instruction.attrib["opcode"] == "POPFRAME": TODO
+        #elif instruction.attrib["opcode"] == "DEFVAR": TODO
+        #elif instruction.attrib["opcode"] == "CALL": TODO
+        #elif instruction.attrib["opcode"] == "RETURN": TODO                
+        #elif instruction.attrib["opcode"] == "PUSHS": TODO
+        #elif instruction.attrib["opcode"] == "POPS":               TODO   
+    #    elif instruction.attrib["opcode"] == "READ": #var type TODO
+    #        print("READ")
+    #        print(instruction[0].text)
+    #        print(instruction[1].text)
+    #        if instruction[1].attrib["type"] == "type":
+    #            vstup = input()
+    #            reg_bool = re.search("^true",vstup,re.IGNORECASE)
+    #            if reg_bool:
+    #                instruction[0].text = "bool@true"
+    ##                print(instruction[0].text)
+    #            else:
+    #                instruction[0].text = "bool@false"
+    #                print(instruction[0].text)
+    #            reg_int = re.search("^((\+|-)?[0-9]\d*)$",vstup)
+    #            if reg_int:
+    #                instruction[0] = "int"
+    #            else:
+    #                instruction[0] = "0"
+                              
+        elif instruction.attrib["opcode"] == "WRITE":  #<symb>
+            print("WRITE")
+            #print(instruction[0].attrib)
+            #print("\n")
+            #print(instruction[0].text)                               
+            if instruction[0].attrib["type"] == "bool":
+                if instruction[0].text == "true":
+                    print("true",end='')
+                else:
+                    print("false",end='')
+            elif instruction[0].attrib["type"] == "int":
+                print(int(instruction[0].text),end='')
+            elif instruction[0].attrib["type"] == "string":
+                print(instruction[0].text,end='')
+            elif instruction[0].attrib["type"] == "string":
+                print(instruction[0].text,end='')  
+            else:
+                errorMessage("Zly typ",32)    
+                           
             
                     
     #for instruction in root_program:
