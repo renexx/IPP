@@ -311,9 +311,13 @@ for instruction in root_program:
 class frames:    
     GF = {} # vytvorenie slovnika pre GF ramec teda globalny ramec
     TF = None # temporary frame si nastavíme zatial na none čiže neni defined
-    LF = None
-    stack = []
-
+    LF = []
+    dataStack = []
+    callStack = []
+    variableName = Instruction[0].text
+    variableNamesplited = variableName.split("@",1)
+    frame = variableNamesplited[0]
+    variable = variableNamesplited[1]
     @classmethod
     def addToFrame(self,variableName):
         frame = self.identifFrame(frameName)
@@ -360,27 +364,7 @@ class frames:
             errorMessage("Neinicializovany frame",32)
         return frame
                                            
-    
-            #if(frame == "GF"):
-                #        variable_value = variable_splited[1]
-                #G#F[variable_value] = [instruction[0].attrib["type"],instruction[0].text]
-            #    print(GF)
-        #    else:
-        #        errorMessage("nejaky semanticky erro premena aj cislo",32)
-        #    if(frame == "TF"):
-        #        if(TF == None):
-        #            errorMessage("neni dksmds",32)
-        #        else:    
-        #            TF[variable_value] = [instruction[0].attrib["type"],instruction[0].text]
-        #    if(frame == "LF"):
-        #        if(LF):
-        #            LF[(-1)variable_value] = [instruction[0].attrib["type"],instruction[0].text]
-        #        else:
-        #            errorMessage("aaasaa",32)   
-            
 
-
-    
     for instruction in root_program:
         if instruction.attrib["opcode"] == "ADD":
             #print(instruction[0].text)
@@ -536,10 +520,6 @@ class frames:
         elif instruction.attrib["opcode"] == "TYPE": # <var> <symb>
             print("TYPE")
             print(instruction[1].text)
-            
-            
-            
-            
             boola = instruction[1].text
             print(type(boola))
             #typ = instruction[1].text
@@ -573,35 +553,88 @@ class frames:
                 var = instruction[0].text
                 var_sp = var.split("@",1)
                 sys.stderr.write(var_sp[1])
-        #elif instruction.attrib["opcode"] == "BREAK":TODO
+        elif instruction.attrib["opcode"] == "BREAK":
         #elif instruction.attrib["opcode"] == "MOVE": #<var> <symb>TODO
-        #elif instruction.attrib["opcode"] == "CREATEFRAME":TODO
-        #elif instruction.attrib["opcde"] == "PUSHFRAME":     TODO                  
-        #elif instruction.attrib["opcode"] == "POPFRAME": TODO
-        #elif instruction.attrib["opcode"] == "DEFVAR": TODO
+        elif instruction.attrib["opcode"] == "CREATEFRAME":
+            print("CREATEFRAME")
+            TF = {}
+            print("TOTO JE DOCASTNY RAMEC")
+            print(TF)
+        elif instruction.attrib["opcode"] == "PUSHFRAME":
+            LF.append(TF)
+            TF = None
+            if TF == None:
+                errorMessage("Pristup k nedefinovanemu ramcu",55)
+                              
+        elif instruction.attrib["opcode"] == "POPFRAME":
+            try:
+                TF = LF.pop()
+            except IndexError as err:
+                errorMessage(err.args[0],55) 
+                   
+        elif instruction.attrib["opcode"] == "DEFVAR":
+            if frame == "GF":
+                GF[variable] = None
+            if frame == "TF":
+                if TF == None:
+                    errorMessage("Pristup k nedefinovanemu ramcu",55)
+                else:
+                    TF[variable] = None
+            if frame == "LF":
+                if LF:
+                    LF[-1][variable] = None
+                else:
+                    errorMessage("Pristup k nedefinovanemu ramcu",55)                
+                    
         #elif instruction.attrib["opcode"] == "CALL": TODO
         #elif instruction.attrib["opcode"] == "RETURN": TODO                
-        #elif instruction.attrib["opcode"] == "PUSHS": TODO
-        #elif instruction.attrib["opcode"] == "POPS":               TODO   
-    #    elif instruction.attrib["opcode"] == "READ": #var type TODO
-    #        print("READ")
-    #        print(instruction[0].text)
-    #        print(instruction[1].text)
-    #        if instruction[1].attrib["type"] == "type":
-    #            vstup = input()
-    #            reg_bool = re.search("^true",vstup,re.IGNORECASE)
-    #            if reg_bool:
-    #                instruction[0].text = "bool@true"
-    ##                print(instruction[0].text)
-    #            else:
-    #                instruction[0].text = "bool@false"
-    #                print(instruction[0].text)
-    #            reg_int = re.search("^((\+|-)?[0-9]\d*)$",vstup)
-    #            if reg_int:
-    #                instruction[0] = "int"
-    #            else:
-    #                instruction[0] = "0"
-                              
+        elif instruction.attrib["opcode"] == "PUSHS":
+            dataStack.append(instruction[0].text)
+        elif instruction.attrib["opcode"] == "POPS":
+            try:
+                dataStack.pop(inst)
+            except IndexError as err:
+                errorMessage(err.args[0],55)
+                   
+        #elif instruction.attrib["opcode"] == "READ": #var type 
+        #    print("READ") # pre dbuging
+        #    print(instruction[0].text) # var
+        #    print(instruction[1].text) #type
+        #    vstup = input() #nacitanie vstupu
+        #    bool = re.search("^true",vstup,re.IGNORECASE) #regulak pre bool hlada true a je jedno ci True alebo true alebo TRUE 
+        #    vstup = vstup.split(" ") #nacitany vstup si rozdelime podla medzier
+        #    print(vstup) 
+        #    if vstup[1] == "string": #ak je ten ahoj string tak je to string  
+        #        if vstup[1] == instruction[1].text: #ak je ten vstup rovnaky s xml
+        #            instruction[0].text = vstup[0] #do varu ulozime hodnotu ktoru sme nacitali
+        #            print(instruction[0].text)
+        #            print("si string")
+        #        else:
+        #            instruction[0].text = ""  #ak neni tak prazdny retazec
+        #            print(instruction[0].text)
+        #    elif vstup[1] == "int":
+        #        if vstup[1] == instruction[1].text:
+        #            instruction[0].text = vstup[0]
+        #            print(instruction[0].text)
+        #            print("si integer")
+        #        else:
+        #            instruction[0].text = "0"
+        #            print(instruction[0].text)
+        #    elif vstup[1] == "bool":
+        #        if vstup[1] == instruction[1].text:
+        #            if bool:
+        #                instruction[0].text = vstup[0]
+        #                print(instruction[0].text)
+        #                print("si true")
+        #            else:
+        #                instruction[0].text = "false"
+        #                print(instruction[0].text)
+        #                print("si false")
+        #        else:
+        #            instruction[0].text = "false"
+        #            print(instruction[0].text)        
+        #    else:
+        #        print("zle zadany typ")                       
         elif instruction.attrib["opcode"] == "WRITE":  #<symb>
             print("WRITE")
             #print(instruction[0].attrib)
@@ -619,55 +652,32 @@ class frames:
             elif instruction[0].attrib["type"] == "string":
                 print(instruction[0].text,end='')  
             else:
-                errorMessage("Zly typ",32)    
-                           
-            
-                    
-    #for instruction in root_program:
-    #    if instruction.attrib["opcode"] 
-    #GF = {}
-    #TF = None
-    #LF = []
-    #for instruction in root_program:
-    #    variable = instruction[0].text
-#        variable_splited = variable.split("@",1)
-#        frame = variable_splited[0]
-        #if(frame == "GF"):
-            #        variable_value = variable_splited[1]
-            #G#F[variable_value] = [instruction[0].attrib["type"],instruction[0].text]
-        #    print(GF)
-    #    else:
-    #        errorMessage("nejaky semanticky erro premena aj cislo",32)
-    #    if(frame == "TF"):
-    #        if(TF == None):
-    #            errorMessage("neni dksmds",32)
-    #        else:    
-    #            TF[variable_value] = [instruction[0].attrib["type"],instruction[0].text]
-    #    if(frame == "LF"):
-    #        if(LF):
-    #            LF[(-1)variable_value] = [instruction[0].attrib["type"],instruction[0].text]
-    #        else:
-    #            errorMessage("aaasaa",32)                    
-
-# 
-                
-#LF je prblem cely zasobnik ramcu
-#urobime si zasobnik Listom
-#LF = []
-
-
-#if(ramec == "LF"):
-#    if LF:
-#        LF[(-1)nazov_value] = [instrukce[1].attrib["type"].instrukcie[1].text]
-#    else:
-#        print chyba    
-#je to list a ked pride pushframe tak do toho listu 
-#LF.append({}) pridame do neho slovnik
-#if LF:
-#    LF.pop() ak nepojde pushframe ak tam insensitive mozne sa stat ze tam bude popframe
-                
-#ak pride CREATEFRAME
-#TF= {}
+                errorMessage("Zly typ",32)
+        elif instruction.attrib["opcode"] == "LABEL":
+            print("LABEL")
+            print(instruction[0].text)
+            print(instruction.attrib["order"])
+            if instruction[0].text in Labels:
+                errorMessage("Pokus o redefinaciu uz existujuceho navesti",52)
+            else:
+                Labels[instruction[0].text] = instruction.attrib["order"]
+                print(Labels)
+        elif instruction.attrib["opcode"] == "JUMP":
+            print("JUMP")
+            print(instruction[0].text)
+            print(instruction.attrib["order"])        
+            if instruction[0].text not in Labels:
+                errorMessage("undefined label",52)    
+            else:
+                pass
+        elif instruction.attrib["opcode"] == "CALL":
+            print("CALL")
+            print(instruction[0].text)
+            print(instruction.attrib["order"])
+            if instruction[0].text not in Labels:
+                errorMessage("undefined label",52)
+            else:
+                pass                       
                
 #dom.write("example.xml")
 
