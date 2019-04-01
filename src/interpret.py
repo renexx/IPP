@@ -195,18 +195,6 @@ for instruction in root_program:
         for argument in instruction:
             if "type" not in argument.attrib:
                 errorMessage("Chyba type u MOVE,INT2CHAR,TYPE,STRLEN",32)
-            if(argument.tag == "arg1"):
-                if(argument.attrib["type"] != "var"):
-                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg1 var",32)
-                else:
-                    variableCheck(argument.attrib["type"],argument.text)
-            elif(argument.tag == "arg2"):
-                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg2 int,string,bool,nil alebo to moze byt var",32)
-                else:
-                    symbolCheck(argument.attrib["type"],argument.text)    
-            else:
-                errorMessage("Zle argumenty u MOVE,INT2CHAR,TYPE,STRLEN",32)
             counter_arg += 1
         if(counter_arg != 2):
             errorMessage("Zly pocet argumentov u MOVE,INT2CHAR,TYPE,STRLEN",32)                        
@@ -216,18 +204,6 @@ for instruction in root_program:
         for argument in instruction:
             if "type" not in argument.attrib:
                 errorMessage("Chyba type u READ",32)
-            if(argument.tag == "arg1"):
-                if(argument.attrib["type"] != "var"):
-                    errorMessage("Pri READ musi byt arg1 var",32)
-                else:
-                    variableCheck(argument.attrib["type"],argument.text)    
-            elif(argument.tag == "arg2"):
-                if(argument.attrib["type"] != "type"):
-                    errorMessage("Pri READ musi byt arg2 type",32)
-                else:
-                    typeCheck(argument.attrib["type"],argument.text)    
-            else:
-                errorMessage("Zle argumenty u READ",32)
             counter_arg +=1
         if(counter_arg != 2):
             errorMessage("Zly pocet argumentov u READ",32)
@@ -237,50 +213,16 @@ for instruction in root_program:
         for argument in instruction:
             if "type" not in argument.attrib:
                 errorMessage("Chyba type u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR ",32)
-            if(argument.tag == "arg1"):
-                if(argument.attrib["type"] != "var"):
-                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg1 var",32)
-                else:
-                    variableCheck(argument.attrib["type"],argument.text)    
-            elif(argument.tag == "arg2"):
-                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg2 int,string,bool,nil,var",32)
-                else:
-                    symbolCheck(argument.attrib["type"],argument.text)    
-            elif(argument.tag == "arg3"):
-                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg3 int,string,bool,nil,var",32)
-                else:
-                    symbolCheck(argument.attrib["type"],argument.text)                                                    
-            else:
-                errorMessage("Zle argumenty u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)
             counter_arg += 1
         if(counter_arg != 3):
             errorMessage("Zly pocet argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32) 
                   
-#3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ    TODO <arg3 type="string" />          
+#3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ           
     elif instruction.attrib["opcode"] in ["JUMPIFEQ","JUMPIFNEQ"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
                 errorMessage("Chyba type u JUMPIFEQ, JUMPIFNEQ ",32)
-            if(argument.tag == "arg1"):
-                if(argument.attrib["type"] != "label"):
-                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg1 label",32)
-                else:
-                    labelCheck(argument.attrib["type"],argument.text)    
-            elif(argument.tag == "arg2"):
-                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg2 int,string,bool,nil,var",32)
-                else:
-                    symbolCheck(argument.attrib["type"],argument.text)    
-            elif(argument.tag == "arg3"):
-                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg3 int,string,bool,nil,var",32)
-                else:
-                    symbolCheck(argument.attrib["type"],argument.text)                                                    
-            else:
-                errorMessage("Zle argumenty u JUMPIFEQ a JUMPIFNEQ",32)
             counter_arg += 1
         if(counter_arg != 3):
             errorMessage("Zly pocet argumentov u JUMPIFEQ a JUMPIFNEQ",32) 
@@ -303,9 +245,79 @@ for instruction in root_program:
             errorMessage("Zle poradie argumentov u MOVE, INT2CHAR, TYPE, STRLEN, READ",32)
     if instruction.attrib["opcode"] in ["ADD,SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
         if(instruction[0].tag != "arg1" or instruction[1].tag != "arg2" or instruction[2].tag != "arg3"):
-            errorMessage("Zle poradie argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)         
-###########################################################################   
-                
+            errorMessage("Zle poradie argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)
+# 2 operandy [var][symb]-int,string,bool,nil MOVE,INT2CHAR,TYPE,STRLEN            
+    if instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN"]:                 
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "var"):
+                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg1 var",32)
+                else:
+                    variableCheck(argument.attrib["type"],argument.text)
+            elif(argument.tag == "arg2"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg2 int,string,bool,nil alebo to moze byt var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)    
+            else:
+                errorMessage("Zle argumenty u MOVE,INT2CHAR,TYPE,STRLEN",32)
+# 2 operandy [var][type] READ                
+    elif instruction.attrib["opcode"] in ["READ"]: 
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "var"):
+                    errorMessage("Pri READ musi byt arg1 var",32)
+                else:
+                    variableCheck(argument.attrib["type"],argument.text)    
+            elif(argument.tag == "arg2"):
+                if(argument.attrib["type"] != "type"):
+                    errorMessage("Pri READ musi byt arg2 type",32)
+                else:
+                    typeCheck(argument.attrib["type"],argument.text)    
+            else:
+                errorMessage("Zle argumenty u READ",32)
+#3 operandy [var] [symb1] [symb2] symbol moze byt var, int, string, bool, nil ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR
+    elif instruction.attrib["opcode"] in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:            
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "var"):
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg1 var",32)
+                else:
+                    variableCheck(argument.attrib["type"],argument.text)    
+            elif(argument.tag == "arg2"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg2 int,string,bool,nil,var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)    
+            elif(argument.tag == "arg3"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg3 int,string,bool,nil,var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)                                                    
+            else:
+                errorMessage("Zle argumenty u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)
+#3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ 
+    elif instruction.attrib["opcode"] in ["JUMPIFEQ","JUMPIFNEQ"]:
+        for argument in instruction:
+            if(argument.tag == "arg1"):
+                if(argument.attrib["type"] != "label"):
+                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg1 label",32)
+                else:
+                    labelCheck(argument.attrib["type"],argument.text)    
+            elif(argument.tag == "arg2"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg2 int,string,bool,nil,var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)    
+            elif(argument.tag == "arg3"):
+                if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
+                    errorMessage("Pri JUMPIFEQ a JUMPIFNEQ musi byt arg3 int,string,bool,nil,var",32)
+                else:
+                    symbolCheck(argument.attrib["type"],argument.text)                                                    
+            else:
+                errorMessage("Zle argumenty u JUMPIFEQ a JUMPIFNEQ",32)
+   
+
     counter_order += 1
     
 class frames:    
