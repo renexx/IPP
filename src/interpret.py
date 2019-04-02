@@ -680,16 +680,15 @@ class frames:
                         errorMessage(error.args[0],58)
                 else:
                     errorMessage("nejaka chyba nejaky navratovy kod neviem aky",32)
+            elif instruction[1].attrib["type"] == "int":
+                value = int(instruction[1].text)
+                try:
+                    result = chr(value)
+                    identifFrame(instruction[0].text,"int",result)
+                except ValueError as error:
+                    errorMessage(error.args[0],58)
             else:
-                if instruction[1].attrib["type"] == "int":
-                    value = int(instruction[1].text)
-                    try:
-                        result = chr(value)
-                        identifFrame(instruction[0].text,"int",result)
-                    except ValueError as error:
-                        errorMessage(error.args[0],58)
-                else:
-                    errorMessage("zle zle zle",32)   
+                errorMessage("zle zle zle",32)   
             
         elif instruction.attrib["opcode"] == "STRI2INT":
             print("STRI2INT")
@@ -793,30 +792,153 @@ class frames:
                      identifFrame(instruction[0].text,"int",result)
                  
         elif instruction.attrib["opcode"] == "STRLEN":
-            if instruction[1].attrib["type"] != "string":
-                errorMessage("Zly typ pri STRLEN, symb1 musi byt string",32)
+            if instruction[1].attrib["type"] == "var":
+                var = getVar(instruction[1].text)
+                if var[0] == "string":    
+                    result = int(len(var[1]))
+                    identifFrame(instruction[0].text,"string",result)
+                else:
+                    errorMessage("Error",32)
+            elif instruction[1].attrib["type"] == "string":
+                result = int(len(instruction[1].text))
+                identifFrame(instruction[0].text,"string",result)       
             else:
-                print("STRLEN")
-                print(instruction[1].text)            
-                instruction[0].text = int(len(instruction[1].text))   
-                print(instruction[0].text) 
-                print("\n")  
-        elif instruction.attrib["opcode"] == "GETCHAR":
-                print("GETCHAR")
-                print(instruction[1].text)
-                print(instruction[2].text)    
+                errorMessage("eer",32)   
+                 
+        elif instruction.attrib["opcode"] == "GETCHAR": 
+            if instruction[1].attrib["type"] == "var":
+                var = getVar(instruction[1].text)
+                if var[0] == "string" and instruction[2].attrib["type"] == "int":
+                    var[1] = instruction[1].text #hodnota
+                    intValue = int(instruction[2].text) #int hodnota
+                    if 0 <= intValue < len(var[1]):
+                        listStringvalue = list(var[1])
+                        result = listStringvalue[intValue]
+                        identifFrame(instruction[0].text,"string",result)                   
+                    else:
+                        errorMessage("Mimo rozsah u GETCHAR",58)         
+                else:
+                    errorMessage("chyba",32)  
+            elif  instruction[2].attrib["type"] == "var":
+                var = getVar(instruction[2].text)    
+                if var[0] == "string" and instruction[1].attrib["type"] == "int":
+                    var[1] = instruction[2].text #hodnota
+                    intValue = int(instruction[1].text) #int hodnota 
+                    if 0 <= intValue < len(var[1]):
+                        listStringvalue = list(var[1])
+                        result = listStringvalue[intValue]
+                        identifFrame(instruction[0].text,"string",result)                   
+                    else:
+                        errorMessage("Mimo rozsah u GETCHAR",58)         
+                else:
+                    errorMessage("chyba",32)      
+            elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
+                var1 = getVar(instruction[1].text)
+                var2 = getVar(instruction[2].text)
+                if var1[0] == "string" and var2[0] == "int":
+                    var1[1] = instruction[1].text #hodnota
+                    var2[1] = int(instruction[2].text) #int hodnota 
+                    if 0 <= var2[1] < len(var1[1]):
+                        listStringvalue = list(var1[1])
+                        result = listStringvalue[var2[1]]
+                        identifFrame(instruction[0].text,"string",result)                   
+                    else:
+                        errorMessage("Mimo rozsah u GETCHAR",58)         
+                else:
+                    errorMessage("chyba",32)     
+            else:    
                 if instruction[1].attrib["type"] == "string" and instruction[2].attrib["type"] == "int":
                     stringValue = instruction[1].text
                     intValue = int(instruction[2].text)
-                    varValue = instruction[0].text
                     if 0 <= intValue < len(stringValue):
                         listStringvalue = list(stringValue)
-                        varValue = listStringvalue[intValue]
-                        print(varValue)
+                        result = listStringvalue[intValue]
+                        identifFrame(instruction[0].text,"string",result)           
                     else:
                         errorMessage("Mimo rozsah u GETCHAR",58)
                 else:
                      errorMessage("zle zadane typy pri GETCHAR, symb1 ma byt string, symb2 : int",32)
+        elif instruction.attrib["opcode"] == "SETCHAR":
+            if instruction[0].attrib["type"] == "var" and instruction[1].attrib["type"] == "var":
+                var0 = getVar(instruction[0].text)
+                var1 = getVar(instruction[1].text)
+                symb2 = instruction[2].text
+                if var0[0] == "string" and var1[0] == "int" and symb2 == "string":
+                    var0[1] = instruction[0].text
+                    var1[1] = int(instruction[1].text)
+                    if 0 <= var1[1] < len(var0[1]):
+                        if symb2 != "":    
+                            listvar = list(var0[1])
+                            listsymb2 = list(symb2)
+                            result = var0[1].replace(listvar[var1[1]],listsymb2[0])   
+                            identifFrame(instruction[0].text,"string",result)
+                        else:
+                            errorMessage("Pradny retazec symb2 u SETCHAR",58)                   
+                    else:
+                        errorMessage("Mimo rozsah u SETCHAR",58)
+                    
+                else:
+                    errorMessage("pojeb",32)
+            elif instruction[0].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
+                var0 = getVar(instruction[0].text)
+                var2 = getVar(instruction[2].text)
+                symb1 = int(instruction[1].text)
+                if var0[0] == "string" and symb1 == "int" and var2[0] == "string":
+                    var0[1] = instruction[0].text
+                    var2[1] = instruction[2].text
+                    if 0 <= symb1 < len(var0[1]):
+                        if var2[1] != "":    
+                            listvar = list(var0[1])
+                            listsymb2 = list(var2[1])
+                            result = var0[1].replace(listvar[symb1],listsymb2[0])   
+                            identifFrame(instruction[0].text,"string",result)
+                        else:
+                            errorMessage("Pradny retazec symb2 u SETCHAR",58)                   
+                    else:
+                        errorMessage("Mimo rozsah u SETCHAR",58)
+                    
+                else:
+                    errorMessage("pojeb",32)
+            elif instruction[0].attrib["type"] == "var" and instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
+                var0 = getVar(instruction[0].text)
+                var1 = getVar(instruction[1].text)
+                var2 = getVar(instruction[2].text)
+                if var0[0] == "string" and var1[0] == "int" and var2[0] == "string":
+                    var0[1] = instruction[0].text
+                    var1[1] = int(instruction[1].text)
+                    var2[1] = instruction[2].text 
+                    if 0 <= var1[1] < len(var0[1]):
+                        if var2[1] != "":    
+                            listvar = list(var0[1])
+                            listsymb2 = list(var2[1])
+                            result = var.replace(listvar[var1[1]],listsymb2[0])
+                           identifFrame(instruction[0].text,"string",result)
+                        else:
+                            errorMessage("Pradny retazec symb2 u SETCHAR",58)                   
+                    else:
+                        errorMessage("Mimo rozsah u SETCHAR",58)
+                else:
+                    errorMessage("aaa",32)        
+                                        
+            else:    
+                if instruction[0].attrib["type"] == "var" and instruction[1].attrib["type"] == "int" and instruction[2].attrib["type"] == "string":
+                    var = getVar(instruction[0].text)
+                    if var[0] == "string":
+                        var[1] = instruction[0].text    
+                        symb1 = int(instruction[1].text)
+                        symb2 = instruction[2].text
+                        if 0 <= symb1 < len(var):
+                            if symb2 != "":    
+                                listvar = list(var)
+                                listsymb2 = list(symb2)
+                                result = var.replace(listvar[symb1],listsymb2[0])
+                               identifFrame(instruction[0].text,"string",result)
+                            else:
+                                errorMessage("Pradny retazec symb2 u SETCHAR",58)                   
+                        else:
+                            errorMessage("Mimo rozsah u SETCHAR",58)
+                else:
+                     errorMessage("zle zadane typy pri SETCHAR, symb1 ma byt int, symb2 : string",32)            
         elif instruction.attrib["opcode"] == "TYPE": # <var> <symb>
             print("TYPE")
             print(instruction[1].text)
