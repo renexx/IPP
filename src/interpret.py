@@ -371,10 +371,23 @@ def getVar(variable):
         else:
             errorMessage("Pristup k nedefinovanemu ramcu",55)
         if variableName not in LF:
-            errorMessage("",32)       
-        
-
+            errorMessage("",32)      
+             
 for instruction in root_program:
+######################################## LABEL #######################################################                
+        elif instruction.attrib["opcode"] == "LABEL":
+            print("LABEL")
+            print(instruction[0].text)
+            print(instruction.attrib["order"])
+            if instruction[0].text in Labels:
+                errorMessage("Pokus o redefinaciu uz existujuceho navesti",52)
+            else:
+                Labels[instruction[0].text] = instruction.attrib["order"]
+                print(Labels)
+###############################################################################################################        
+counter  = 0
+while counter < counter_order -1:
+    instruction = root_program[counter]
 ######################################## ADD #######################################š###########                   
     if instruction.attrib["opcode"] == "ADD":
         #print(instruction[0].text)
@@ -1054,9 +1067,122 @@ for instruction in root_program:
             else:
                 errorMessage("Pristup k nedefinovanemu ramcu",55)                
 ######################################################## CALL #####################################################                    
-    #elif instruction.attrib["opcode"] == "CALL": TODO
+    elif instruction.attrib["opcode"] == "CALL":
+        print("CALL")
+        print(instruction[0].text)
+        print(instruction.attrib["order"])
+        if instruction[0].text not in Labels:
+            errorMessage("undefined label",52)
+        else:
+            callStack.append(counter + 1)
+            counter = Labels.get(instruction[0].text)
+            continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+                
 ######################################################## RETURN ####################################################        
-    #elif instruction.attrib["opcode"] == "RETURN": TODO
+    elif instruction.attrib["opcode"] == "RETURN":
+        if instruction[0].text not in Labels:
+            errorMessage("undefined label",52)
+        else:
+            callStack.pop(counter)
+            counter = Labels.get(instruction[0].text)
+            continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+###################################### JUMP ###########################################################                
+    elif instruction.attrib["opcode"] == "JUMP":
+        print("JUMP")
+        print(instruction[0].text)
+        print(instruction.attrib["order"])        
+        if instruction[0].text not in Labels:
+            errorMessage("undefined label",52)    
+        else:
+            counter = Labels.get(instruction[0].text)
+            continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+####################################### JUMPIFEQ <label> <symb1> <symb2> ###############################################
+    elif instruction.attrib["opcode"] == "JUMPIFEQ":  
+        if instruction[1].attrib["type"] == "var":        
+            var = getVar(instruction[1].text) # symb1 = var
+            if var[0] == instruction[2].attrib["type"] and var[1] == instruction[2].text:
+                if instruction[0].text not in Labels:
+                    errorMessage("undefined label",52)    
+                else:
+                    counter = Labels.get(instruction[0].text)
+                    continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+            else:
+                errorMessage("ERROR JUMPIFEQ",53)
+                            
+        elif instruction[2].attrib["type"] == "var":
+            var = getVar(instruction[2].text) # symb2 = var
+            if var[0] == instruction[1].attrib["type"] and var[1] == instruction[1].text:
+                if instruction[0].text not in Labels:
+                    errorMessage("undefined label",52)    
+                else:
+                    counter = Labels.get(instruction[0].text)
+                    continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+            else:
+                errorMessage("ERROR JUMPIFEQ",53)
+        elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":     
+            var1 = getVar(instruction[1].text) # symb1 = var
+            var2 = getVar(instruction[2].text) # symb2 = var
+            if var1[0] == var2[0] and va1r[1] == var2[1]:
+                if instruction[0].text not in Labels:
+                    errorMessage("undefined label",52)    
+                else:
+                    counter = Labels.get(instruction[0].text)
+                    continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+            else:
+                errorMessage("ERROR JUMPIFEQ",53)
+        else:
+            if instruction[1].attrib["type"] == instruction[2].attrib["type"] and instruction[1].text == instruction[2].text:
+                if instruction[0].text not in Labels:
+                    errorMessage("undefined label",52)    
+                else:
+                    counter = Labels.get(instruction[0].text)
+                    continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+            else:
+                errorMessage("ERROR JUMPIFEQ",53)     
+############################################### JUMPIFNEQ ########################################################
+    elif instruction.attrib["opcode"] == "JUMPIFNEQ":  
+         if instruction[1].attrib["type"] == "var":        
+             var = getVar(instruction[1].text) # symb1 = var
+             if var[0] == instruction[2].attrib["type"] and var[1] != instruction[2].text:
+                 if instruction[0].text not in Labels:
+                     errorMessage("undefined label",52)    
+                 else:
+                     counter = Labels.get(instruction[0].text)
+                     continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+             else:
+                 errorMessage("ERROR JUMPIFNEQ",53)
+                             
+         elif instruction[2].attrib["type"] == "var":
+             var = getVar(instruction[2].text) # symb2 = var
+             if var[0] == instruction[1].attrib["type"] and var[1] != instruction[1].text:
+                 if instruction[0].text not in Labels:
+                     errorMessage("undefined label",52)    
+                 else:
+                     counter = Labels.get(instruction[0].text)
+                     continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+             else:
+                 errorMessage("ERROR JUMPIFNEQ",53)
+         elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":     
+             var1 = getVar(instruction[1].text) # symb1 = var
+             var2 = getVar(instruction[2].text) # symb2 = var
+             if var1[0] == var2[0] and va1r[1] != var2[1]:
+                 if instruction[0].text not in Labels:
+                     errorMessage("undefined label",52)    
+                 else:
+                     counter = Labels.get(instruction[0].text)
+                     continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+             else:
+                 errorMessage("ERROR JUMPIFNEQ",53)
+         else:
+             if instruction[1].attrib["type"] == instruction[2].attrib["type"] and instruction[1].text != instruction[2].text:
+                 if instruction[0].text not in Labels:
+                     errorMessage("undefined label",52)    
+                 else:
+                     counter = Labels.get(instruction[0].text)
+                     continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+             else:
+                 errorMessage("ERROR JUMPIFNEQ",53)  
+            
 ######################################################## PUSHS #####################################################                        
     elif instruction.attrib["opcode"] == "PUSHS":
         dataStack.append(instruction[0].text)
@@ -1134,34 +1260,27 @@ for instruction in root_program:
             print(instruction[0].text, end='')              
         else:
             errorMessage("Zly typ",32)
-######################################## LABEL #######################################################                
-    elif instruction.attrib["opcode"] == "LABEL":
-        print("LABEL")
-        print(instruction[0].text)
-        print(instruction.attrib["order"])
-        if instruction[0].text in Labels:
-            errorMessage("Pokus o redefinaciu uz existujuceho navesti",52)
-        else:
-            Labels[instruction[0].text] = instruction.attrib["order"]
-            print(Labels)
-###################################### JUMP ###########################################################                
-    elif instruction.attrib["opcode"] == "JUMP":
-        print("JUMP")
-        print(instruction[0].text)
-        print(instruction.attrib["order"])        
-        if instruction[0].text not in Labels:
-            errorMessage("undefined label",52)    
-        else:
-            pass
-######################################### CALL ############################################################š                
-    elif instruction.attrib["opcode"] == "CALL":
-        print("CALL")
-        print(instruction[0].text)
-        print(instruction.attrib["order"])
-        if instruction[0].text not in Labels:
-            errorMessage("undefined label",52)
-        else:
-            pass                       
-           
+            
+
+                   
+counter += 1           
 #dom.write("example.xml")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
