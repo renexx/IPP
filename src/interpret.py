@@ -190,42 +190,25 @@ for instruction in root_program:
         if(counter_arg != 1):
             errorMessage("Zly pocet argumentov u CALL LABEL A JUMP",32)          
 # 2 operandy [var][symb]-int,string,bool,nil MOVE,INT2CHAR,TYPE,STRLEN
-    elif instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN"]:
+    elif instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN","READ","NOT"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
-                errorMessage("Chyba type u MOVE,INT2CHAR,TYPE,STRLEN",32)
+                errorMessage("Chyba type u MOVE,INT2CHAR,TYPE,STRLEN,READ,NOT",32)
             counter_arg += 1
         if(counter_arg != 2):
-            errorMessage("Zly pocet argumentov u MOVE,INT2CHAR,TYPE,STRLEN",32)                        
-# 2 operandy [var][type] READ
-    elif instruction.attrib["opcode"] in ["READ"]:
-        counter_arg = 0
-        for argument in instruction:
-            if "type" not in argument.attrib:
-                errorMessage("Chyba type u READ",32)
-            counter_arg +=1
-        if(counter_arg != 2):
-            errorMessage("Zly pocet argumentov u READ",32)
+            errorMessage("Zly pocet argumentov u MOVE,INT2CHAR,TYPE,STRLEN,READ,NOT",32)                        
 #3 operandy [var] [symb1] [symb2] symbol moze byt var, int, string, bool, nil ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR
-    elif instruction.attrib["opcode"] in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
+    elif instruction.attrib["opcode"] in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR","JUMPIFEQ","JUMPIFNEQ"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
-                errorMessage("Chyba type u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR ",32)
+                errorMessage("Chyba type u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR,JUMPIFEQ,JUMPIFNEQ",32)
             counter_arg += 1
         if(counter_arg != 3):
-            errorMessage("Zly pocet argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32) 
+            errorMessage("Zly pocet argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR,JUMPIFEQ,JUMPIFNEQ",32) 
                   
-#3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ           
-    elif instruction.attrib["opcode"] in ["JUMPIFEQ","JUMPIFNEQ"]:
-        counter_arg = 0
-        for argument in instruction:
-            if "type" not in argument.attrib:
-                errorMessage("Chyba type u JUMPIFEQ, JUMPIFNEQ ",32)
-            counter_arg += 1
-        if(counter_arg != 3):
-            errorMessage("Zly pocet argumentov u JUMPIFEQ a JUMPIFNEQ",32) 
+
     else:
         errorMessage("Neznamy operacny kod",32)
 
@@ -239,27 +222,27 @@ for instruction in root_program:
     if int(instruction.get("order")) != counter_order:
         errorMessage("Zly order, order musi zacitat od 1",32)
 # TOTO PRETO ABY NEBOLO PRI DAKEJ INSTRUKCI arg1 arg1##########################        
-    if instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN","READ"]:    
+    if instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN","READ,NOT"]:    
         if(instruction[0].tag != "arg1" or instruction[1].tag != "arg2"):
-            errorMessage("Zle poradie argumentov u MOVE, INT2CHAR, TYPE, STRLEN, READ",32)
-    if instruction.attrib["opcode"] in ["ADD,SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
+            errorMessage("Zle poradie argumentov u MOVE, INT2CHAR, TYPE, STRLEN, READ,NOT",32)
+    if instruction.attrib["opcode"] in ["ADD,SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR","JUMPIFEQ","JUMPIFNEQ"]:
         if(instruction[0].tag != "arg1" or instruction[1].tag != "arg2" or instruction[2].tag != "arg3"):
-            errorMessage("Zle poradie argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)
+            errorMessage("Zle poradie argumentov u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR,JUMPIFEQ,JUMPIFNEQ",32)
 # 2 operandy [var][symb]-int,string,bool,nil MOVE,INT2CHAR,TYPE,STRLEN            
-    if instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN"]:                 
+    if instruction.attrib["opcode"] in ["MOVE","INT2CHAR","TYPE","STRLEN,NOT"]:                 
         for argument in instruction:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
-                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg1 var",32)
+                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN, NOT musi byt arg1 var",32)
                 else:
                     variableCheck(argument.attrib["type"],argument.text)
             elif(argument.tag == "arg2"):
                 if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN musi byt arg2 int,string,bool,nil alebo to moze byt var",32)
+                    errorMessage("Pri MOVE,INT2CHAR,TYPE,STRLEN,NOT musi byt arg2 int,string,bool,nil alebo to moze byt var",32)
                 else:
                     symbolCheck(argument.attrib["type"],argument.text)    
             else:
-                errorMessage("Zle argumenty u MOVE,INT2CHAR,TYPE,STRLEN",32)
+                errorMessage("Zle argumenty u MOVE,INT2CHAR,TYPE,STRLEN,NOT",32)
 # 2 operandy [var][type] READ                
     elif instruction.attrib["opcode"] in ["READ"]: 
         for argument in instruction:
@@ -276,25 +259,25 @@ for instruction in root_program:
             else:
                 errorMessage("Zle argumenty u READ",32)
 #3 operandy [var] [symb1] [symb2] symbol moze byt var, int, string, bool, nil ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR
-    elif instruction.attrib["opcode"] in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","NOT","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:            
+    elif instruction.attrib["opcode"] in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:            
         for argument in instruction:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
-                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg1 var",32)
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg1 var",32)
                 else:
                     variableCheck(argument.attrib["type"],argument.text)    
             elif(argument.tag == "arg2"):
                 if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg2 int,string,bool,nil,var",32)
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg2 int,string,bool,nil,var",32)
                 else:
                     symbolCheck(argument.attrib["type"],argument.text)    
             elif(argument.tag == "arg3"):
                 if argument.attrib["type"] not in ["int","string","bool","nil","var"]:
-                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg3 int,string,bool,nil,var",32)
+                    errorMessage("Pri ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR musi byt arg3 int,string,bool,nil,var",32)
                 else:
                     symbolCheck(argument.attrib["type"],argument.text)                                                    
             else:
-                errorMessage("Zle argumenty u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)
+                errorMessage("Zle argumenty u ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)
 #3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ 
     elif instruction.attrib["opcode"] in ["JUMPIFEQ","JUMPIFNEQ"]:
         for argument in instruction:
@@ -332,68 +315,69 @@ def identifFrame(variable,value,typ):
     variableName = variable.split("@",1)[1]
     if frame == "GF":
         if variableName not in GF:
-            errorMessage("",32)
+            errorMessage("variable neni v gf",32)
         else:    
             GF[variableName] = [value,typ]
     if frame == "TF":
         if TF == None:
             errorMessage("Pristup k nedefinovanemu ramcu",55)
         elif variableName not in TF:
-            errorMessage("",32)    
+            errorMessage("variable neni v tf",32)    
         else:
             TF[variableName] = [value,typ]
     if frame == "LF":
         if LF:
-            LF[-1][variableName] = [value,typ]
+            LF[-1][variableName] = [value,typ]    
         else:
             errorMessage("Pristup k nedefinovanemu ramcu",55)
-        if variableName not in LF:
-            errorMessage("",32)      
+        if variableName not in LF[-1]:
+            errorMessage("variable neni v lf",32)      
                
 def getVar(variable):
     frame = variable.split("@",1)[0]
     variableName = variable.split("@",1)[1]
     if frame == "GF":
         if variableName not in GF:
-            errorMessage("",32)
+            errorMessage("variable neni v gf",32)
         else:    
             return GF.get(variableName)
     if frame == "TF":
         if TF == None:
             errorMessage("Pristup k nedefinovanemu ramcu",55)
         elif variableName not in TF:
-            errorMessage("",32)    
+            errorMessage("varuable neni v tf",32)    
         else:
-            return TF.get(VariableName)
+            return TF.get(variableName)
     if frame == "LF":
         if LF:
-            return LF[-1].get(VariableName)    
+            return LF[-1].get(variableName)    
         else:
             errorMessage("Pristup k nedefinovanemu ramcu",55)
         if variableName not in LF:
-            errorMessage("",32)      
+            errorMessage("variable neni v lf",32)      
              
 for instruction in root_program:
 ######################################## LABEL #######################################################                
-        elif instruction.attrib["opcode"] == "LABEL":
-            print("LABEL")
-            print(instruction[0].text)
-            print(instruction.attrib["order"])
+        if instruction.attrib["opcode"] == "LABEL":
+        
+            
             if instruction[0].text in Labels:
                 errorMessage("Pokus o redefinaciu uz existujuceho navesti",52)
             else:
-                Labels[instruction[0].text] = instruction.attrib["order"]
-                print(Labels)
-###############################################################################################################        
+                Labels[instruction[0].text] = int(instruction.attrib["order"])
+                
+############################################################################################################### 
+counter_instruction = 0       
 counter  = 0
-while counter < counter_order -1:
+
+while counter < counter_order - 1:
+    
     instruction = root_program[counter]
+    
 ######################################## ADD #######################################š###########                   
+    
     if instruction.attrib["opcode"] == "ADD":
-        #print(instruction[0].text)
-        print("ADD")
-        print(instruction[1].text)
-        print(instruction[2].text)
+        
         if instruction[1].attrib["type"] == "var":
             var = getVar(instruction[1].text)
             if var[0] == "int" and instruction[2].attrib["type"] == "int":
@@ -425,9 +409,7 @@ while counter < counter_order -1:
                 errorMessage("nejaka chyba nejaky navratovy kod neviem aky",32)
 ############################################# SUB ##############################################                        
     elif instruction.attrib["opcode"] == "SUB":
-        print("SUB")
-        print(instruction[1].text)
-        print(instruction[2].text)
+    
         if instruction[1].attrib["type"] == "var":
             var = getVar(instruction[1].text)
             if var[0] == "int" and instruction[2].attrib["type"] == "int":
@@ -459,9 +441,7 @@ while counter < counter_order -1:
                 errorMessage("nejaka chyba nejaky navratovy kod neviem aky",32)
 ########################################### MUL ##################################################                    
     elif instruction.attrib["opcode"] == "MUL":
-        print("MUL")
-        print(instruction[1].text)
-        print(instruction[2].text)
+
         if instruction[1].attrib["type"] == "var":
             var = getVar(instruction[1].text)
             if var[0] == "int" and instruction[2].attrib["type"] == "int":
@@ -493,7 +473,7 @@ while counter < counter_order -1:
                 errorMessage("nejaka chyba nejaky navratovy kod neviem aky",32)
 ######################################## IDIV #################################################                    
     elif instruction.attrib["opcode"] == "IDIV":
-        print("IDIV")
+        
         if instruction[1].attrib["type"] == "var":
             var = getVar(instruction[1].text)
             if var[0] == "int" and instruction[2].attrib["type"] == "int":
@@ -547,7 +527,7 @@ while counter < counter_order -1:
                     else:
 ########################################### LT ###############################################################                                
                         if instruction.attrib["opcode"] == "LT":    
-                            print("LT")
+                            
                             if instruction[1].attrib["type"] == "var":
                                 var = getVar(instruction[1].text)
                                 result = var[1] < instruction[2].text
@@ -564,10 +544,10 @@ while counter < counter_order -1:
                             else:    
                                 result = instruction[1].text < instruction[2].text     
                                 identifFrame(instruction[0].text,"bool",result)   
-                                print("\n")
+                                
 ################################################### GT #####################################################                                    
                         elif instruction.attrib["opcode"] == "GT":
-                            print("GT")
+                            
                             if instruction[1].attrib["type"] == "var":
                                 var = getVar(instruction[1].text)
                                 result = var[1] > instruction[2].text
@@ -584,10 +564,10 @@ while counter < counter_order -1:
                             else:
                                 result = instruction[1].text > instruction[2].text     
                                 identifFrame(instruction[0].text,"bool",result) 
-                                print("\n")
+                                
 ############################################### EQ ##########################################################                                    
                 elif instruction.attrib["opcode"] == "EQ":
-                    print("EQ")
+                    
                     if instruction[1].attrib["type"] == "var":
                         var = getVar(instruction[1].text)
                         result = var[1] == instruction[2].text
@@ -623,7 +603,7 @@ while counter < counter_order -1:
                     else:    
                         result = instruction[1].text == instruction[2].text     
                         identifFrame(instruction[0].text,"bool",result)
-                        print("\n")    
+                          
 ############################################ AND #################################################                            
     elif instruction.attrib["opcode"] == "AND":
             if instruction[1].attrib["type"] == "var":
@@ -706,10 +686,10 @@ while counter < counter_order -1:
         if instruction[1].attrib["type"] == "var":
             var = getVar(instruction[1].text)
             if var[0] == "int":    
-                value = int(instruction[1].text)
+                var[1] = int(var[1])
                 try:
-                    result = chr(value)
-                    identifFrame(instruction[0].text,"int",result)
+                    result = chr(var[1])
+                    identifFrame(instruction[0].text,"string",result)
                 except ValueError as error:
                     errorMessage(error.args[0],58)
             else:
@@ -718,14 +698,14 @@ while counter < counter_order -1:
             value = int(instruction[1].text)
             try:
                 result = chr(value)
-                identifFrame(instruction[0].text,"int",result)
+                identifFrame(instruction[0].text,"string",result)
             except ValueError as error:
                 errorMessage(error.args[0],58)
         else:
             errorMessage("zle zle zle",32)   
 ####################################### STRI2INT #################################################š            
     elif instruction.attrib["opcode"] == "STRI2INT":
-        print("STRI2INT")
+        
         if instruction[1].attrib["type"] == "var":
             var = getVar(instruction[1].text)
             if var[0] == "string" and instruction[2].attrib["type"] == "int":
@@ -827,15 +807,16 @@ while counter < counter_order -1:
 ########################################### STRLEN ############################################                 
     elif instruction.attrib["opcode"] == "STRLEN":
         if instruction[1].attrib["type"] == "var":
+            print(instruction[1].text)
             var = getVar(instruction[1].text)
             if var[0] == "string":    
                 result = int(len(var[1]))
-                identifFrame(instruction[0].text,"string",result)
+                identifFrame(instruction[0].text,"int",result)
             else:
                 errorMessage("Error",32)
         elif instruction[1].attrib["type"] == "string":
             result = int(len(instruction[1].text))
-            identifFrame(instruction[0].text,"string",result)       
+            identifFrame(instruction[0].text,"int",result)       
         else:
             errorMessage("eer",32)   
 ####################################### GETCHAR #############################################                
@@ -895,17 +876,15 @@ while counter < counter_order -1:
 ########################################## SETCHAR #############################################                     
     elif instruction.attrib["opcode"] == "SETCHAR":
         if instruction[0].attrib["type"] == "var" and instruction[1].attrib["type"] == "var":
-            var0 = getVar(instruction[0].text)
-            var1 = getVar(instruction[1].text)
-            symb2 = instruction[2].text
-            if var0[0] == "string" and var1[0] == "int" and symb2 == "string":
-                var0[1] = instruction[0].text
-                var1[1] = int(instruction[1].text)
-                if 0 <= var1[1] < len(var0[1]):
-                    if symb2 != "":    
-                        listvar = list(var0[1])
-                        listsymb2 = list(symb2)
-                        result = var0[1].replace(listvar[var1[1]],listsymb2[0])   
+            string = getVar(instruction[0].text)
+            index = getVar(instruction[1].text)
+            char = instruction[2].text
+            if string[0] == "string" and index[0] == "int" and char == "string":
+                string[1] = instruction[0].text
+                index[1] = int(instruction[1].text)
+                if 0 <= index[1] < len(string):
+                    if char != "":    
+                        result = string[1][:index[1]] + char[0] + string[1][index[1] +1:]  #orezeme podla indexu cize ked mame ahoj a idndex bude 2 tak bude ah pridame 0znak napr a cize aha a plus to co tam bolo 
                         identifFrame(instruction[0].text,"string",result)
                     else:
                         errorMessage("Pradny retazec symb2 u SETCHAR",58)                   
@@ -915,17 +894,15 @@ while counter < counter_order -1:
             else:
                 errorMessage("pojeb",32)
         elif instruction[0].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var0 = getVar(instruction[0].text)
-            var2 = getVar(instruction[2].text)
-            symb1 = int(instruction[1].text)
-            if var0[0] == "string" and symb1 == "int" and var2[0] == "string":
-                var0[1] = instruction[0].text
-                var2[1] = instruction[2].text
-                if 0 <= symb1 < len(var0[1]):
-                    if var2[1] != "":    
-                        listvar = list(var0[1])
-                        listsymb2 = list(var2[1])
-                        result = var0[1].replace(listvar[symb1],listsymb2[0])   
+            string = getVar(instruction[0].text)
+            char = getVar(instruction[2].text)
+            index = int(instruction[1].text)
+            if string[0] == "string" and index == "int" and char[0] == "string":
+                string[1] = instruction[0].text
+                char[1] = instruction[2].text
+                if 0 <= index < len(string[1]):
+                    if char[1] != "":    
+                        result = string[1][:index] + char[1][0] + string[1][index + 1:]   
                         identifFrame(instruction[0].text,"string",result)
                     else:
                         errorMessage("Pradny retazec symb2 u SETCHAR",58)                   
@@ -935,18 +912,16 @@ while counter < counter_order -1:
             else:
                 errorMessage("pojeb",32)
         elif instruction[0].attrib["type"] == "var" and instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var0 = getVar(instruction[0].text)
-            var1 = getVar(instruction[1].text)
-            var2 = getVar(instruction[2].text)
-            if var0[0] == "string" and var1[0] == "int" and var2[0] == "string":
-                var0[1] = instruction[0].text
-                var1[1] = int(instruction[1].text)
-                var2[1] = instruction[2].text 
-                if 0 <= var1[1] < len(var0[1]):
-                    if var2[1] != "":    
-                        listvar = list(var0[1])
-                        listsymb2 = list(var2[1])
-                        result = var.replace(listvar[var1[1]],listsymb2[0])
+            string = getVar(instruction[0].text)
+            index = getVar(instruction[1].text)
+            char = getVar(instruction[2].text)
+            if string[0] == "string" and index[0] == "int" and char[0] == "string":
+                string[1] = instruction[0].text
+                index[1] = int(instruction[1].text)
+                char[1] = instruction[2].text 
+                if 0 <= index[1] < len(string[1]):
+                    if char[1] != "":    
+                        result = string[1][:index[1]] + char[1][0] + string[1][index[1] + 1:]
                         identifFrame(instruction[0].text,"string",result)
                     else:
                         errorMessage("Pradny retazec symb2 u SETCHAR",58)                   
@@ -957,16 +932,14 @@ while counter < counter_order -1:
                                     
         else:    
             if instruction[0].attrib["type"] == "var" and instruction[1].attrib["type"] == "int" and instruction[2].attrib["type"] == "string":
-                var = getVar(instruction[0].text)
-                if var[0] == "string":
-                    var[1] = instruction[0].text    
-                    symb1 = int(instruction[1].text)
-                    symb2 = instruction[2].text
-                    if 0 <= symb1 < len(var):
-                        if symb2 != "":    
-                            listvar = list(var)
-                            listsymb2 = list(symb2)
-                            result = var.replace(listvar[symb1],listsymb2[0])
+                string = getVar(instruction[0].text)
+                if string[0] == "string":
+                    string[1] = instruction[0].text    
+                    index = int(instruction[1].text)
+                    char = instruction[2].text
+                    if 0 <= index < len(string[1]):
+                        if char != "":    
+                            result = string[1][:index] + char[0] + string[1][index + 1:]
                             identifFrame(instruction[0].text,"string",result)
                         else:
                             errorMessage("Pradny retazec symb2 u SETCHAR",58)                   
@@ -1005,7 +978,7 @@ while counter < counter_order -1:
 
 ################################################ DPRINT ###########################################################                
     elif instruction.attrib["opcode"] == "DPRINT":
-        print("DPRINT")
+        
         if instruction[0].attrib["type"] == "string":
             sys.stderr.write(instruction[0].text)
         elif instruction[0].attrib["type"] == "bool":
@@ -1021,7 +994,16 @@ while counter < counter_order -1:
             sys.stderr.write(var_sp[1])
 ################################################# BREAK ##########################################################                
     elif instruction.attrib["opcode"] == "BREAK":
-        pass
+        sys.stderr.write("\nPozicia kodu:{0} \n".format(instruction.attrib["order"]))
+        sys.stderr.write("Labels:{0}\n".format(Labels))
+        sys.stderr.write("Obsah LF:{0}\n".format(LF))
+        sys.stderr.write("Obsah TF:{0}\n".format(TF))
+        sys.stderr.write("Obsah GF:{0}\n".format(GF))
+        sys.stderr.write("Pocet vykonanych instrukci:{0}\n".format(counter_instruction))
+        sys.stderr.write("Zasobnik volani:{0}\n".format(callStack))
+        sys.stderr.write("Zasobnik variable:{0}\n".format(dataStack))
+        
+        
 #################################### MOVE ################################################################            
     elif instruction.attrib["opcode"] == "MOVE": #<var> <symb> | moze byt var [int,string,bool,nil] alebo var var
         if instruction[1].attrib["type"] == "var": #ak je symb var
@@ -1034,16 +1016,14 @@ while counter < counter_order -1:
             errorMessage("zle zle zle",32)   
 #################################### CREATEFRAME #################################################################        
     elif instruction.attrib["opcode"] == "CREATEFRAME":
-        print("CREATEFRAME")
+        
         TF = {}
-        print("TOTO JE DOCASTNY RAMEC")
-        print(TF)
+        
 ################################################ PUSHFRAME ######################################################            
     elif instruction.attrib["opcode"] == "PUSHFRAME":
         LF.append(TF)
         TF = None
-        if TF == None:
-            errorMessage("Pristup k nedefinovanemu ramcu",55)
+    
 ############################################## POPFRAME ##############################################################                              
     elif instruction.attrib["opcode"] == "POPFRAME":
         try:
@@ -1063,14 +1043,13 @@ while counter < counter_order -1:
                 TF[variable] = None
         if frame == "LF":
             if LF:
+                print("hori mi rit")
                 LF[-1][variable] = None
             else:
                 errorMessage("Pristup k nedefinovanemu ramcu",55)                
 ######################################################## CALL #####################################################                    
     elif instruction.attrib["opcode"] == "CALL":
-        print("CALL")
-        print(instruction[0].text)
-        print(instruction.attrib["order"])
+        
         if instruction[0].text not in Labels:
             errorMessage("undefined label",52)
         else:
@@ -1080,17 +1059,13 @@ while counter < counter_order -1:
                 
 ######################################################## RETURN ####################################################        
     elif instruction.attrib["opcode"] == "RETURN":
-        if instruction[0].text not in Labels:
-            errorMessage("undefined label",52)
-        else:
-            callStack.pop(counter)
-            counter = Labels.get(instruction[0].text)
-            continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+        try:
+            counter = callStack.pop()
+        except IndexError as err:
+            errorMessage(err.args[0],55)    
+        continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
 ###################################### JUMP ###########################################################                
-    elif instruction.attrib["opcode"] == "JUMP":
-        print("JUMP")
-        print(instruction[0].text)
-        print(instruction.attrib["order"])        
+    elif instruction.attrib["opcode"] == "JUMP":     
         if instruction[0].text not in Labels:
             errorMessage("undefined label",52)    
         else:
@@ -1185,24 +1160,32 @@ while counter < counter_order -1:
             
 ######################################################## PUSHS #####################################################                        
     elif instruction.attrib["opcode"] == "PUSHS":
-        dataStack.append(instruction[0].text)
+        if instruction[0].attrib["type"] == "var":
+            var = getVar(instruction[0].text)
+            dataStack.append(var)
+        else:    
+            dataStack.append([instruction[0].attrib["type"],instruction[0].text])
 ########################################################## POPS ####################################################            
-    elif instruction.attrib["opcode"] == "POPS":
-        try:
-            dataStack.pop(inst)
-        except IndexError as err:
-            errorMessage(err.args[0],55)
+    elif instruction.attrib["opcode"] == "POPS": # TODO
+        if instruction[0].attrib["type"] == "var":
+            var = getVar(instruction[0].text)
+            try:
+                var = dataStack.pop()
+            except IndexError as err:
+                errorMessage(err.args[0],56)
+            identifFrame(instruction[0].text,var[0],var[1])    
+        else:
+            errorMessage("zly typ",32)        
 ############################################ READ ##################################################################                   
     elif instruction.attrib["opcode"] == "READ": #var type 
-        vstup = input() #nacitanie vstupu
-        check_typebool = re.search("^true",vstup,re.IGNORECASE) #regulak pre bool hlada true a je jedno ci True alebo true alebo TRUE 
-        check_typestring = re.search("([^\ \\\\#]|\\\\[0-9]{3})*$",vstup)
-        check_typeint = re.search("^((\+|-)?[0-9]\d*)$",vstup)
-        
         if STDINInput: #ak je STDIN input true
             inputl = input()
         else:
             inputl = input.readline().split("\n")[0]    
+        check_typebool = re.search("^true",inputl,re.IGNORECASE) #regulak pre bool hlada true a je jedno ci True alebo true alebo TRUE 
+        check_typestring = re.search("([^\ \\\\#]|\\\\[0-9]{3})*$",inputl)
+        check_typeint = re.search("^((\+|-)?[0-9]\d*)$",inputl)
+        
         
         if instruction[1].text == "int":
             if check_typeint:
@@ -1228,10 +1211,9 @@ while counter < counter_order -1:
                 identifFrame(instruction[0].text,"bool",inputBool)                
          
         else:
-            print("zle zadany typ")
+            errorMessage("zle zadany typ",32)
 ######################################### WRITE #################################################                               
-    elif instruction.attrib["opcode"] == "WRITE":  #<symb>
-        print("WRITE")                           
+    elif instruction.attrib["opcode"] == "WRITE":  #<symb>                          
         if instruction[0].attrib["type"] == "bool":
             if instruction[0].text == "true":
                 print("true",end='')
@@ -1243,6 +1225,7 @@ while counter < counter_order -1:
             print(instruction[0].text,end='')
         elif instruction[0].attrib["type"] == "var":
             var = getVar(instruction[0].text)
+            
             if var[0] == "int":
                 print(int(var[1]),end='')
             elif var[0] == "string":
@@ -1255,7 +1238,7 @@ while counter < counter_order -1:
             elif var[0] == "nil":
                 print(var[1],end='')
             else:
-                errorMessage("spatny typ")                        
+                errorMessage("spatny typ",32)                        
         elif instruction[0].attrib["type"] == "nil":
             print(instruction[0].text, end='')              
         else:
@@ -1263,7 +1246,8 @@ while counter < counter_order -1:
             
 
                    
-counter += 1           
+    counter += 1
+    counter_instruction += 1           
 #dom.write("example.xml")
 
 
