@@ -20,11 +20,16 @@ class CheckArgumentsAndError
     public function __construct()
     {
         $this->recursive = false;
-        $this->directory = realpath("./");
         $this->parser = realpath("./parse.php");
         $this->interpret = realpath("./interpret.py");
         $this->parseonly = false;
         $this->intonly = false;
+        $this->directory = realpath("./");
+        if(!is_dir($this->directory))
+        {
+            self::errorMessage("Specified directory is not a directory",11);
+        }
+        $this->directory = $this->directory."/";
     }
 
     public function parseArguments($argc,$argv)
@@ -163,19 +168,29 @@ class CheckArgumentsAndError
     }
 }
 
+class Test extends CheckArgumentsAndError
+{
+    public function daco()
+    {
+        CheckArgumentsAndError::parseArguments($GLOBALS["argv"],$GLOBALS["argc"]);
+        var_dump($this->directory);
+    }
+}
 
-class HTMLgen
+/*class HTMLgen
 {
     public function generateHtmlPage()
     {
           // Tu bude HTML kod
 
     }
-}
+}*/
 $Argument = new CheckArgumentsAndError();
-$Argument->parseArguments($argc,$argv);
+//$Argument->parseArguments($argc,$argv);
 $Argument->checkFileExists();
-$HtmlGenerator = new HTMLgen();
-$HtmlGenerator->generateHtmlPage();
+//$HtmlGenerator = new HTMLgen
+//$HtmlGenerator->generateHtmlPage();
+$test = new Test();
+$test->daco();
 
  ?>
