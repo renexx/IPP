@@ -34,7 +34,6 @@ class CheckArgumentsAndError
 
     public function parseArguments($argc,$argv)
     {
-        var_dump($this->directory);
 
         $options = array("help","directory::","recursive","parse-script::","int-script::","parse-only","int-only");
         $opts = getopt("",$options);
@@ -54,6 +53,7 @@ class CheckArgumentsAndError
                     self::errorMessage("Specified directory is not a directory",11);
                 }
                 $this->directory = realpath($opts["directory"])."/";
+                print("riadok 57");
                 var_dump($this->directory);
 
             }
@@ -107,6 +107,7 @@ class CheckArgumentsAndError
                     self::errorMessage("Specified directory is not a directory",11);
                 }
                 $this->directory = realpath($opts["directory"])."/";
+                print("riadok 110");
                 var_dump($this->directory);
             }
             elseif(isset($opts["recursive"]))
@@ -170,12 +171,37 @@ class CheckArgumentsAndError
 
 class Test extends CheckArgumentsAndError
 {
-    public function daco()
+
+    public function runTest()
     {
         CheckArgumentsAndError::parseArguments($GLOBALS["argv"],$GLOBALS["argc"]);
+        $files = scandir($this->directory);
         var_dump($this->directory);
+        var_dump($files);
+        $base = basename($this->directory);
+        var_dump($this->directory);
+        foreach($files as $file)
+        {
+            if(is_dir($this->directory.$file))
+            {
+                if($this->recursive == true)
+                    if($file == "." || $file == "..")
+                    continue;
+                    self::runTest($this->directory . $file . "/");
+            }
+                else
+                {
+                    continue;
+                }
+        }
+        var_dump($files);
+
     }
 }
+
+
+
+
 
 /*class HTMLgen
 {
@@ -191,6 +217,6 @@ $Argument->checkFileExists();
 //$HtmlGenerator = new HTMLgen
 //$HtmlGenerator->generateHtmlPage();
 $test = new Test();
-$test->daco();
+$test->runTest();
 
  ?>
