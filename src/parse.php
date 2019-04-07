@@ -191,6 +191,7 @@ class Parser
                 case "INT2CHAR":
                 case "TYPE":
                 case "STRLEN":
+                case "NOT":
                     if (count($splitLineToWord) != 3)
                     {
                         CheckArgumentsAndError::errorMessage("Wrong count of operands",23);
@@ -243,7 +244,6 @@ class Parser
                 case "EQ":
                 case "AND":
                 case "OR":
-                case "NOT":
                 case "STRI2INT":
                 case "CONCAT":
                 case "GETCHAR":
@@ -357,7 +357,7 @@ class Parser
         $replace = array("&lt;","&gt;","&quot;","&apos;");
         $match = str_replace($pattern,$replace,$match);
 
-        $match = explode("@",$match[0]);
+        $match = explode("@",$match[0],2);
         $argTmp = $xml->createElement("arg$i","$match[1]");
         $argTmp->setAttribute("type",$var);
         $instruction->appendChild($argTmp);

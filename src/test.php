@@ -168,16 +168,20 @@ class CheckArgumentsAndError
 class Test extends CheckArgumentsAndError
 {
     public $tests = array();
-
+    public $testCounter = 0;
+    public $testPassed = 0;
+    public $testFail = 0;
+    public $passedarray = array();
     public function runTest()
     {
         $in = false;
         $out = false;
         $rc = false;
         $tests;
+        $passedarray;
         CheckArgumentsAndError::parseArguments($GLOBALS["argv"],$GLOBALS["argc"]);
         self::recursive($this->directory);
-        //var_dump($this->tests);
+        $this->testCounter;
         foreach($this->tests as $files)
         {
             $daco = pathinfo($files);
@@ -239,67 +243,91 @@ class Test extends CheckArgumentsAndError
             }
             $rc = file_get_contents($daco["dirname"]."/".$daco["filename"].".rc"); // nacitanie obsahu rc
 
-            if($this->parseonly == true)
+            if($daco["basename"] == $daco["filename"].".src")
             {
-                exec("php7.3 ".$this->parser. "< ".$daco["dirname"]."/".$daco["filename"].".src > ./tempfileparse",$output,$ret_parse);
-                if($rc == $ret_parse)
+                if($this->parseonly == true)
                 {
-                    exec("java -jar /pub/courses/ipp/jexamxml/jexamxml.jar tempfileparse ".$daco["dirname"]."/".$daco["filename"].".out /pub/courses/ipp/jexamxml/options",$output,$ret_parse);
-                    if($ret_parse == 0)
+                    exec("php7.3 ".$this->parser. "< ".$daco["dirname"]."/".$daco["filename"].".src > ./tempfileparse",$output,$ret_parse);
+                    if($rc == $ret_parse)
                     {
-                        print("ok\n");
+                        exec("java -jar /pub/courses/ipp/jexamxml/jexamxml.jar tempfileparse ".$daco["dirname"]."/".$daco["filename"].".out /pub/courses/ipp/jexamxml/options",$output,$ret_parse);
+                        if($ret_parse == 0)
+                        {
+
+                            print("TEST:".$daco["basename"].": PASSED\n");
+                            //    $this->passedarray = $daco["basename"];
+                            $this->testPassed++;
+
+                        }
+                        else
+                        {
+                            print("TEST ".$daco["basename"].": FAILED\n");
+                            $this->testFail++;
+
+                        }
                     }
                     else
                     {
-                        print("Chyba v teste ".$daco["basename"]."\n");
+                        print("TEST RC FAILED:".$daco["basename"].": FAILED\n");
+                        $this->testFail++;
+                    }
+                }
+                elseif($this->intonly == true)
+                {
+                    exec("python3.6".$this->interpret. "--source=".$daco["dirname"]."/". "--input=".$daco["dirname"]."/".$daco["filename"]. ".in > ./tempfileint",$output,$rc_return_var);
+                    if($rc == $rc_return_var)
+                    {
+                        exec("diff ". $daco["dirname"]."/".$daco["filename"].".out tempfileint",$output,$diff_ret);
+                        if($diff_ret == 0)
+                        {
+                            print("TEST:".$daco["basename"]." PASSED\n");
+                            $this->testPassed++;
+                        }
+                        else
+                        {
+                            print("TEST ".$daco["basename"].": FAILED\n");
+                            $this->testFail++;
+                        }
+                    }
+                    else
+                    {
+                        print("TEST RC:".$daco["basename"].": FAILED\n");
+                        $this->testFail++;
                     }
                 }
                 else
                 {
-                    print($daco["basename"].":neni ok nerovnaju sa rc\n");
-                }
-            }
-            elseif($this->intonly == true)
-            {
-                exec("python3.6".$this->interpret. "--source=".$daco["dirname"]."/". "--input=".$daco["dirname"]."/".$daco["filename"]. ".in > ./tempfileint",$output,$rc_return_var);
-                if($rc == $rc_return_var)
-                {
-                    exec("diff ". $daco["dirname"]."/".$daco["filename"].".out tempfileint",$output,$diff_ret);
-                    if($diff_ret == 0)
-                        print("ok");
+                    exec("php7.3 ".$this->parser. "< ".$daco["dirname"]."/".".src > ./tempfileboth");
+                    exec("python3.6".$this->interpret. "--source=".$daco["dirname"]."/". "--input=".$daco["dirname"]."/".$daco["filename"]. ".in > ./tempfileboth",$output,$rc_return_var);
+                    if($rc == $rc_return_var)
+                    {
+                        exec("diff ". $daco["dirname"].$daco["filename"]."/".".out tempfileboth",$output,$diff_ret);
+                        if($diff_ret == 0)
+                        {
+                            print("TEST:".$daco["basename"]." PASSED\n");
+                            $this->testPassed++;
+                        }
+                        else
+                        {
+                            print("TEST ".$daco["basename"].": FAILED\n");
+                            $this->testFail++;
+                        }
+                    }
                     else
                     {
-                        print("neni ok neni su rovnake");
+                        print("TEST:".$daco["basename"].": FAILED\n");
+                        $this->testFail++;
                     }
                 }
-                else
-                {
-                    print("test nepresiel nerovnaju sa rc");
-                }
-            }
-            else
-            {
-                exec("php7.3 ".$this->parser. "< ".$daco["dirname"]."/".".src > ./tempfileboth");
-                exec("python3.6".$this->interpret. "--source=".$daco["dirname"]."/". "--input=".$daco["dirname"]."/".$daco["filename"]. ".in > ./tempfileboth",$output,$rc_return_var);
-                if($rc == $rc_return_var)
-                {
-                    exec("diff ". $daco["dirname"].$daco["filename"]."/".".out tempfileboth",$output,$diff_ret);
-                    if($diff_ret == 0)
-                        print("ok");
-                    else
-                    {
-                        print("neni ok neni su rovnake");
-                    }
-                }
-                else
-                {
-                    print("test nepresiel nerovnaju sa rc");
-                }
+                $this->testCounter++;
             }
         }
             exec("rm -rf ./tempfileparse");
             exec("rm -rf ./tempfileint");
             exec("rm -rf ./tempfileboth");
+            print("\nPOCET TESTOV:" .$this->testCounter."\n");
+            print("POCET PREJDENYCH:".$this->testPassed);
+            print("\nPOCET NEPREJDENYCH: ".$this->testFail."\n");
     }
 
 
