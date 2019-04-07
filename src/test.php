@@ -212,15 +212,96 @@ class Test extends CheckArgumentsAndError
             }
             if($rc == false)
             {
-                exec("touch ". $daco["dirname"] . "/". $daco["filename"].".rc",$output,$return_var);
+                exec("touch ". $daco["dirname"] . "/". $daco["filename"].".rc",$output,$return_var); //aby sme mohli skontrolovat ci sa vie vygenerovat alebo nie output tam musi byt neni to nic a return var tam je ta navratova hodnota
                 exec("echo 0 >>" .  $daco["dirname"]."/".$daco["filename"].".rc");
                 if($return_var == 1)
                 {
                     CheckArgumentsAndError::errorMessage("Couldn´t generate .rc file",12);
                 }
             }
+
+        //////////////////////////////////////START TESTING /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////// PARSE ONLY ////////////////////////
+            exec("touch ./tempfileparse",$output,$return_var);
+            if($return_var == 1)
+            {
+                CheckArgumentsAndError::errorMessage("Couldn´t make temporary file for parse",12);
+            }
+            exec("touch ./tempfileint",$output,$return_var);
+            if($return_var == 1)
+            {
+                CheckArgumentsAndError::errorMessage("Couldn´t make temporary file for interpret",12);
+            }
+            exec("touch ./tempfileboth",$output,$return_var);
+            if($return_var == 1)
+            {
+                CheckArgumentsAndError::errorMessage("Couldn´t make temporary file for both parse and interpret",12);
+            }
+            $rc = file_get_contents($daco["dirname"]."/".$daco["filename"].".rc"); // nacitanie obsahu rc
+
+            if($this->parseonly == true)
+            {
+                exec("php7.3 ".$this->parser. "< ".$daco["dirname"]."/".$daco["filename"].".src > ./tempfileparse",$output,$ret_parse);
+                if($rc == $ret_parse)
+                {
+                    exec("java -jar /pub/courses/ipp/jexamxml/jexamxml.jar tempfileparse ".$daco["dirname"]."/".$daco["filename"].".out /pub/courses/ipp/jexamxml/options",$output,$ret_parse);
+                    if($ret_parse == 0)
+                    {
+                        print("ok\n");
+                    }
+                    else
+                    {
+                        print("Chyba v teste ".$daco["basename"]."\n");
+                    }
+                }
+                else
+                {
+                    print($daco["basename"].":neni ok nerovnaju sa rc\n");
+                }
+            }
+            elseif($this->intonly == true)
+            {
+                exec("python3.6".$this->interpret. "--source=".$daco["dirname"]."/". "--input=".$daco["dirname"]."/".$daco["filename"]. ".in > ./tempfileint",$output,$rc_return_var);
+                if($rc == $rc_return_var)
+                {
+                    exec("diff ". $daco["dirname"]."/".$daco["filename"].".out tempfileint",$output,$diff_ret);
+                    if($diff_ret == 0)
+                        print("ok");
+                    else
+                    {
+                        print("neni ok neni su rovnake");
+                    }
+                }
+                else
+                {
+                    print("test nepresiel nerovnaju sa rc");
+                }
+            }
+            else
+            {
+                exec("php7.3 ".$this->parser. "< ".$daco["dirname"]."/".".src > ./tempfileboth");
+                exec("python3.6".$this->interpret. "--source=".$daco["dirname"]."/". "--input=".$daco["dirname"]."/".$daco["filename"]. ".in > ./tempfileboth",$output,$rc_return_var);
+                if($rc == $rc_return_var)
+                {
+                    exec("diff ". $daco["dirname"].$daco["filename"]."/".".out tempfileboth",$output,$diff_ret);
+                    if($diff_ret == 0)
+                        print("ok");
+                    else
+                    {
+                        print("neni ok neni su rovnake");
+                    }
+                }
+                else
+                {
+                    print("test nepresiel nerovnaju sa rc");
+                }
+            }
         }
+            exec("rm -rf ./tempfileparse");
+            exec("rm -rf ./tempfileint");
+            exec("rm -rf ./tempfileboth");
     }
+
 
     public function recursive($dir)
     {
