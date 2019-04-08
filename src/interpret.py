@@ -15,6 +15,7 @@ def showHelp():
      print("doplnit")
      sys.exit(0)
 
+STDINInput = False
 if len(sys.argv) > 3 and len(sys.argv) < 2 :
     errorMessage("Wrong count of arguments",10)
 
@@ -82,7 +83,9 @@ def symbolCheck(attribType,operand):
         if not check_symbolint:
             errorMessage("Wrong entered type: int",32)
     elif(attribType == "string"):
-        check_symbolstring = re.search("([^\ \\\\#]|\\\\[0-9]{3})*$",operand)
+        if not operand:
+            return
+        check_symbolstring = re.search("^([^\ \\\\#]|\\\\[0-9]{3})*$",operand)
         if not check_symbolstring:
             errorMessage("Wrong entered type: string",32)
     elif(attribType == "bool"):
@@ -140,7 +143,7 @@ for instruction in root_program:
                 errorMessage("Wrong count of arguments in instruction: CREATEFRAME,PUSHFRAME,POPFRAME,RETURN,BREAK",32)
 ###################################################################################################################
 # 1 operand  [var]  DEFVAR, POPS TODO ked mas v instukci arg1 arg1
-elif instruction.attrib["opcode"].upper() in ["DEFVAR","POPS"]:
+    elif instruction.attrib["opcode"].upper() in ["DEFVAR","POPS"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -157,7 +160,7 @@ elif instruction.attrib["opcode"].upper() in ["DEFVAR","POPS"]:
             errorMessage("Wrong count of arguments in instruction DEFVAR,POPS",32)
 
 # 1 operand [symb] = int, string, bool, nil PUSHS, WRITE,EXIT,DPRINT
-elif instruction.attrib["opcode"].upper() in ["PUSHS","WRITE","EXIT","DPRINT"]:
+    elif instruction.attrib["opcode"].upper() in ["PUSHS","WRITE","EXIT","DPRINT"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -175,7 +178,7 @@ elif instruction.attrib["opcode"].upper() in ["PUSHS","WRITE","EXIT","DPRINT"]:
 
 # 1 operand [label] CALL, LABEL, JUMP
 
-elif instruction.attrib["opcode"].upper() in ["CALL","LABEL","JUMP"]:
+    elif instruction.attrib["opcode"].upper() in ["CALL","LABEL","JUMP"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -191,7 +194,7 @@ elif instruction.attrib["opcode"].upper() in ["CALL","LABEL","JUMP"]:
         if(counter_arg != 1):
             errorMessage("Wrong count of operands in instructions: CALL LABEL A JUMP",32)
 # 2 operandy [var][symb]-int,string,bool,nil MOVE,INT2CHAR,TYPE,STRLEN
-elif instruction.attrib["opcode"].upper() in ["MOVE","INT2CHAR","TYPE","STRLEN","READ","NOT"]:
+    elif instruction.attrib["opcode"].upper() in ["MOVE","INT2CHAR","TYPE","STRLEN","READ","NOT"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -200,7 +203,7 @@ elif instruction.attrib["opcode"].upper() in ["MOVE","INT2CHAR","TYPE","STRLEN",
         if(counter_arg != 2):
             errorMessage("Zly pocet argumentov u MOVE,INT2CHAR,TYPE,STRLEN,READ,NOT",32)
 #3 operandy [var] [symb1] [symb2] symbol moze byt var, int, string, bool, nil ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR
-elif instruction.attrib["opcode"].upper() in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR","JUMPIFEQ","JUMPIFNEQ"]:
+    elif instruction.attrib["opcode"].upper() in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR","JUMPIFEQ","JUMPIFNEQ"]:
         counter_arg = 0
         for argument in instruction:
             if "type" not in argument.attrib:
@@ -221,7 +224,8 @@ for instruction in root_program:
     if int(instruction.get("order")) != counter_order:
         errorMessage("Wrong order, order has to  started from 1",32)
 # TOTO PRETO ABY NEBOLO PRI DAKEJ INSTRUKCI arg1 arg1##########################
-    if instruction.attrib["opcode"].uppper() in ["MOVE","INT2CHAR","TYPE","STRLEN","READ,NOT"]:
+
+    if instruction.attrib["opcode"].upper() in ["MOVE","INT2CHAR","TYPE","STRLEN","READ,NOT"]:
         if(instruction[0].tag != "arg1" or instruction[1].tag != "arg2"):
             errorMessage("Arguments are not in order in instruction: MOVE, INT2CHAR, TYPE, STRLEN, READ,NOT",32)
     if instruction.attrib["opcode"].upper() in ["ADD,SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR","JUMPIFEQ","JUMPIFNEQ"]:
@@ -245,7 +249,7 @@ for instruction in root_program:
                 errorMessage("Wrong arguments in instruction MOVE,INT2CHAR,TYPE,STRLEN,NOT",32)
 
 # 2 operandy [var][type] READ
-elif instruction.attrib["opcode"].upper() in ["READ"]:
+    elif instruction.attrib["opcode"].upper() in ["READ"]:
         for argument in instruction:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
@@ -260,7 +264,7 @@ elif instruction.attrib["opcode"].upper() in ["READ"]:
             else:
                 errorMessage("Zle argumenty u READ",32)
 #3 operandy [var] [symb1] [symb2] symbol moze byt var, int, string, bool, nil ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR
-elif instruction.attrib["opcode"].upper() in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
+    elif instruction.attrib["opcode"].upper() in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
         for argument in instruction:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
@@ -280,7 +284,7 @@ elif instruction.attrib["opcode"].upper() in ["ADD","SUB","MUL","IDIV","LT","GT"
             else:
                 errorMessage("Wrong arguments in instruction: ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR",32)
 #3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ
-elif instruction.attrib["opcode"].upper() in ["JUMPIFEQ","JUMPIFNEQ"]:
+    elif instruction.attrib["opcode"].upper() in ["JUMPIFEQ","JUMPIFNEQ"]:
         for argument in instruction:
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "label"):
@@ -329,12 +333,14 @@ def identifFrame(variable,value,typ):
         else:
             TF[variableName] = [value,typ]
     if frame == "LF":
+
         if LF:
-            LF[-1][variableName] = [value,typ]
+            if variableName not in LF[-1]:
+                errorMessage("variable is not in local frame",54)
+            else:
+                LF[-1][variableName] = [value,typ]
         else:
             errorMessage("Access to undefined local frame",55)
-        if variableName not in LF[-1]:
-            errorMessage("variable is not in local frame",54)
 
 def getVar(variable):
     frame = variable.split("@",1)[0]
@@ -342,6 +348,8 @@ def getVar(variable):
     if frame == "GF":
         if variableName not in GF:
             errorMessage("variable is not in global frame",54)
+        elif GF.get(variableName) == None:
+            errorMessage("variable uninitialized",56)
         else:
             return GF.get(variableName)
     if frame == "TF":
@@ -349,17 +357,24 @@ def getVar(variable):
             errorMessage("Access to undefined temporary frame",55)
         elif variableName not in TF:
             errorMessage("variable is not in temporary frame",54)
+        elif TF.get(variableName) == None:
+            errorMessage("variable uninitialized",56)
         else:
             return TF.get(variableName)
     if frame == "LF":
         if LF:
-            return LF[-1].get(variableName)
+            if variableName not in LF[-1]:
+                errorMessage("variable is not in local frame",54)
+            elif LF[-1].get(variableName) == None:
+                errorMessage("variable uninitialized",56)
+            else:
+                return LF[-1].get(variableName)
         else:
             errorMessage("Access to undefined local frame",55)
-        if variableName not in LF:
-            errorMessage("variable is not in local frame",54)
 
 def replaceEscapeSeq(string):
+    if not string:
+        return ""
     string1 = re.findall("[0-9]{3}", string)
 
     for i in string1:
@@ -387,311 +402,270 @@ while counter < counter_order - 1:
 
 ######################################## ADD #######################################š###########
 
-    if instruction.attrib["opcode"].upper() == "ADD":
+    if instruction.attrib["opcode"].upper() in ["ADD","SUB","MUL","IDIV"]:
+        if instruction[1].attrib["type"] == "int":
+            operand1 = int(instruction[1].text)
 
-        if instruction[1].attrib["type"] == "var":
+        elif instruction[1].attrib["type"] == "var":
             var = getVar(instruction[1].text)
-            if var[0] == "int" and instruction[2].attrib["type"] == "int":
-                result = int(var[1]) + int(instruction[2].text)
-                identifFrame(instruction[0].text,"int",result)
+            if var[0] == "int":
+                operand1 = int(var[1])
             else:
-                errorMessage("Wrong types of operands in instruction ADD",53)
+                errorMessage("Wrong types",53)
+        else:
+            errorMessage("Wrong types",53)
+
+        if instruction[2].attrib["type"] == "int":
+            operand2 = int(instruction[2].text)
+
         elif instruction[2].attrib["type"] == "var":
             var = getVar(instruction[2].text)
-            if var[0] == "int" and instruction[1].attrib["type"] == "int":
-                result = int(var[1]) + int(instruction[1].text)
-                identifFrame(instruction[0].text,"int",result)
+            if var[0] == "int":
+                operand2 = int(var[1])
             else:
-                errorMessage("Wrong types of operands in instruction ADD",53)
-
-        elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-            var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-            if var1[0] == "int" and var2[0] == "int":
-                result = int(var1[1]) + int(var2[1])
-                identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong type in ADD",53)
+                errorMessage("Wrong types",53)
         else:
-            if instruction[1].attrib["type"] == "int" and instruction[2].attrib["type"] == "int":
-                result = int(instruction[1].text) + int(instruction[2].text)
-                identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in ADD",53)
-############################################# SUB ##############################################
-    elif instruction.attrib["opcode"].upper() == "SUB":
+            errorMessage("Wrong types",53)
 
-        if instruction[1].attrib["type"] == "var":
-            var = getVar(instruction[1].text)
-            if var[0] == "int" and instruction[2].attrib["type"] == "int":
-                result = int(var[1]) - int(instruction[2].text)
+        if type(operand1) == type(operand2):
+            if instruction.attrib["opcode"].upper() == "ADD":
+                result = operand1 + operand2
                 identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in SUB",53)
-        elif instruction[2].attrib["type"] == "var":
-            var = getVar(instruction[2].text)
-            if var[0] == "int" and instruction[1].attrib["type"] == "int":
-                result = int(var[1]) - int(instruction[1].text)
-                identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in SUB",53)
 
-        elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-            var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-            if var1[0] == "int" and var2[0] == "int":
-                result = int(var1[1]) - int(var2[1])
+            elif instruction.attrib["opcode"].upper() == "SUB":
+                result = operand1 - operand2
                 identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("",32)
+            elif instruction.attrib["opcode"].upper() == "MUL":
+                result = operand1 * operand2
+                identifFrame(instruction[0].text,"int",result)
+            elif instruction.attrib["opcode"].upper() == "IDIV":
+                try:
+                    result = operand1 // operand2
+                except ZeroDivisionError as err:
+                    errorMessage(err.args[0],57)
+                identifFrame(instruction[0].text,"int",result)
         else:
-            if instruction[1].attrib["type"] == "int" and instruction[2].attrib["type"] == "int":
-                result = int(instruction[1].text) - int(instruction[2].text)
-                identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in SUB",53)
-########################################### MUL ##################################################
-    elif instruction.attrib["opcode"].upper() == "MUL":
+            errorMessage("Wrong types",53)
 
-        if instruction[1].attrib["type"] == "var":
-            var = getVar(instruction[1].text)
-            if var[0] == "int" and instruction[2].attrib["type"] == "int":
-                result = int(var[1]) * int(instruction[2].text)
-                identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in MUL",53)
-        elif instruction[2].attrib["type"] == "var":
-            var = getVar(instruction[2].text)
-            if var[0] == "int" and instruction[1].attrib["type"] == "int":
-                result = int(var[1]) * int(instruction[1].text)
-                identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operand in MUL",53)
-
-        elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-            var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-            if var1[0] == "int" and var2[0] == "int":
-                result = int(var1[1]) * int(var2[1])
-                identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in MUL",53)
-        else:
-            if instruction[1].attrib["type"] == "int" and instruction[2].attrib["type"] == "int":
-                result = int(instruction[1].text) * int(instruction[2].text)
-                identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands IN MUL",53)
-######################################## IDIV #################################################
-    elif instruction.attrib["opcode"].upper() == "IDIV":
-
-        if instruction[1].attrib["type"] == "var":
-            var = getVar(instruction[1].text)
-            if var[0] == "int" and instruction[2].attrib["type"] == "int":
-                if int(var[1]) == 0 or int(instruction[2].text) == 0:
-                    errorMessage("Zero division",57)
-                else:
-                    result = int(var[1]) // int(instruction[2].text)
-                    identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in IDIV",53)
-        elif instruction[2].attrib["type"] == "var":
-            var = getVar(instruction[2].text)
-            if var[0] == "int" and instruction[1].attrib["type"] == "int":
-                if int(var[1]) == 0 or int(instruction[2].text) == 0:
-                    errorMessage("Zero division",57)
-                else:
-                    result = int(var[1]) // int(instruction[1].text)
-                    identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in IDIV",53)
-
-        elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-            var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-            if var1[0] == "int" and var2[0] == "int":
-                if int(var1[1]) == 0 or int(var2[1]) == 0:
-                    errorMessage("Zero division",57)
-                else:
-                    result = int(var1[1]) // int(var2[1])
-                    identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in IDIV",53)
-        else:
-            if instruction[1].attrib["type"] == "int" and instruction[2].attrib["type"] == "int":
-                if int(instruction[1].text) == 0 or int(instruction[2].text) == 0:
-                    errorMessage("Zero division",57)
-                else:
-                    result = int(instruction[1].text) // int(instruction[2].text)
-                    identifFrame(instruction[0].text,"int",result)
-            else:
-                errorMessage("Wrong types of operands in IDIV",53)
 ####################################### LT GT EQ ###################################################
-    elif instruction.attrib["opcode"].upper() in ["LT","GT","EQ"]:
-            if instruction[1].attrib["type"] != instruction[2].attrib["type"]:
-                errorMessage("Non-compatibilite types",53)
-            else:
+
+    elif instruction.attrib["opcode"].upper() in ["LT","GT"]:
 ######################################    LT GT  ############################################################
-                if instruction.attrib["opcode"].upper() in ["LT","GT"]:
-                    if instruction[1].attrib["type"] == "nil" or instruction[2].attrib["type"] == "nil":
-                        errorMessage("Can´t be compared LT or GT with nil",53)
-                    else:
-########################################### LT ###############################################################
-                        if instruction.attrib["opcode"].upper() == "LT":
-
-                            if instruction[1].attrib["type"] == "var":
-                                var = getVar(instruction[1].text)
-                                result = var[1] < instruction[2].text
-                                identifFrame(instruction[0].text,"bool",result)
-                            elif instruction[2].attrib["type"] == "var":
-                                var = getVar(instruction[2].text)
-                                result = var[1] < instruction[1].text
-                                identifFrame(instruction[0].text,"bool",result)
-                            elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-                                var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-                                var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-                                result = var1[1] < var2[1]
-                                identifFrame(instruction[0].text,"bool",result)
-                            else:
-                                result = instruction[1].text < instruction[2].text
-                                identifFrame(instruction[0].text,"bool",result)
-
-################################################### GT #####################################################
-                        elif instruction.attrib["opcode"].upper() == "GT":
-
-                            if instruction[1].attrib["type"] == "var":
-                                var = getVar(instruction[1].text)
-                                result = var[1] > instruction[2].text
-                                identifFrame(instruction[0].text,"bool",result)
-                            elif instruction[2].attrib["type"] == "var":
-                                var = getVar(instruction[2].text)
-                                result = var[1] > instruction[1].text
-                                identifFrame(instruction[0].text,"bool",result)
-                            elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-                                var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-                                var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-                                result = var1[1] > var2[1]
-                                identifFrame(instruction[0].text,"bool",result)
-                            else:
-                                result = instruction[1].text > instruction[2].text
-                                identifFrame(instruction[0].text,"bool",result)
+        if instruction[1].attrib["type"] == "int":
+            operand1 = int(instruction[1].text)
+        elif instruction[1].attrib["type"] == "bool":
+            if instruction[1].text == "true":
+                operand1 = True
+            else:
+                operand1 = False
+        elif instruction[1].attrib["type"] == "string":
+            operand1 = replaceEscapeSeq(instruction[1].text)
+        elif instruction[1].attrib["type"] == "var":
+            var = getVar(instruction[1].text)
+            if var[0] == "int":
+                operand1 = int(var[1])
+            elif var[0] == "bool":
+                if var[1] == "true":
+                    operand1 = True
+                else:
+                    operand1 = False
+            elif var[0] == "string":
+                operand1 = replaceEscapeSeq(var[1])
+            else:
+                errorMessage("Wrong types",53)
+        else:
+            errorMessage("Wrong types",53)
+        if instruction[2].attrib["type"] == "int":
+            operand2 = int(instruction[2].text)
+        elif instruction[2].attrib["type"] == "bool":
+            if instruction[2].text == "true":
+                operand2 = True
+            else:
+                operand2 = False
+        elif instruction[2].attrib["type"] == "string":
+            operand2 = replaceEscapeSeq(instruction[2].text)
+        elif instruction[2].attrib["type"] == "var":
+            var = getVar(instruction[2].text)
+            if var[0] == "int":
+                operand2 = int(var[1])
+            elif var[0] == "bool":
+                if var[1] == "true":
+                    operand2 = True
+                else:
+                    operand2 = False
+            elif var[0] == "string":
+                operand2 = replaceEscapeSeq(var[1])
+            else:
+                errorMessage("Wrong types",53)
+        else:
+            errorMessage("Wrong types",53)
+        if type(operand1) == type(operand2):
+            if instruction.attrib["opcode"].upper() == "LT":
+                result = operand1 < operand2
+                if result == True:
+                    result = "true"
+                else:
+                    result = "false"
+                identifFrame(instruction[0].text,"bool",result)
+            elif instruction.attrib["opcode"].upper() == "GT":
+                result = operand1 > operand2
+                if result == True:
+                    result = "true"
+                else:
+                    result = "false"
+                identifFrame(instruction[0].text,"bool",result)
+        else:
+            errorMessage("Wrong types",53)
 
 ############################################### EQ ##########################################################
-                elif instruction.attrib["opcode"].upper() == "EQ":
-
-                    if instruction[1].attrib["type"] == "var":
-                        var = getVar(instruction[1].text)
-                        result = var[1] == instruction[2].text
-                        identifFrame(instruction[0].text,"bool",result)
-                    elif instruction[2].attrib["type"] == "var":
-                        var = getVar(instruction[2].text)
-                        result = var[1] == instruction[1].text
-                        identifFrame(instruction[0].text,"bool",result)
-                    elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-                        var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-                        var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-                        result = var1[1] == var2[1]
-                        identifFrame(instruction[0].text,"bool",result)
-                    else:
-                        result = instruction[1].text == instruction[2].text
-                        identifFrame(instruction[0].text,"bool",result)
-########################################š EQ pre NIL #####################################################š
-            if instruction.attrib["opcode"].upper() == "EQ":
-                if instruction[1].attrib["type"] == "nil" or instruction[2].attrib["type"] == "nil":
-                    if instruction[1].attrib["type"] == "var":
-                        var = getVar(instruction[1].text)
-                        result = var[1] == instruction[2].text
-                        identifFrame(instruction[0].text,"bool",result)
-                    elif instruction[2].attrib["type"] == "var":
-                        var = getVar(instruction[2].text)
-                        result = var[1] == instruction[1].text
-                        identifFrame(instruction[0].text,"bool",result)
-                    elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-                        var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-                        var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-                        result = var1[1] == var2[1]
-                        identifFrame(instruction[0].text,"bool",result)
-                    else:
-                        result = instruction[1].text == instruction[2].text
-                        identifFrame(instruction[0].text,"bool",result)
-
-############################################ AND #################################################
-    elif instruction.attrib["opcode"].upper() == "AND":
-            if instruction[1].attrib["type"] == "var":
-                var = getVar(instruction[1].text)
-                if var[0] == "bool" and instruction[2].attrib["type"] == "bool":
-                    result = bool(var[1]) and bool(instruction[2].text)
-                    identifFrame(instruction[0].text,"bool",result)
-                else:
-                    errorMessage("Wrong types of operands in AND",53)
-            elif instruction[2].attrib["type"] == "var":
-                var = getVar(instruction[2].text)
-                if var[0] == "bool" and instruction[1].attrib["type"] == "bool":
-                    result = bool(var[1]) and bool(instruction[1].text)
-                    identifFrame(instruction[0].text,"bool",result)
-                else:
-                    errorMessage("Wrong types of operands in AND",53)
-
-            elif instruction[1].attrib["type"] == "bool" and instruction[2].attrib["type"] == "bool":
-                var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-                var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-                if var1[0] == "bool" and var2[0] == "bool":
-                    result = bool(var1[1]) and bool(var2[1])
-                    identifFrame(instruction[0].text,"bool",result)
-                else:
-                    errorMessage("Wrong types of operands in AND",53)
+    elif instruction.attrib["opcode"].upper() == "EQ":
+        if instruction[1].attrib["type"] == "int":
+            operand1 = int(instruction[1].text)
+        elif instruction[1].attrib["type"] == "bool":
+            if instruction[1].text == "true":
+                operand1 = True
             else:
-                if instruction[1].attrib["type"] == "bool" and instruction[2].attrib["type"] == "bool":
-                    result = bool(instruction[1].text) and bool(instruction[2].text)
-                    identifFrame(instruction[0].text,"bool",result)
+                operand1 = False
+        elif instruction[1].attrib["type"] == "string":
+            operand1 = replaceEscapeSeq(instruction[1].text)
+        elif instruction[1].attrib["type"] == "nil":
+            operand1 = None
+        elif instruction[1].attrib["type"] == "var":
+            var = getVar(instruction[1].text)
+            if var[0] == "int":
+                operand1 = int(var[1])
+            elif var[0] == "bool":
+                if var[1] == "true":
+                    operand1 = True
                 else:
-                    errorMessage("Wrong types of operands in AND",53)
-############################################### OR ###########################################################
-    elif instruction.attrib["opcode"].upper() == "OR":
-            if instruction[1].attrib["type"] == "var":
-                var = getVar(instruction[1].text)
-                if var[0] == "bool" and instruction[2].attrib["type"] == "bool":
-                    result = bool(var[1]) or bool(instruction[2].text)
-                    identifFrame(instruction[0].text,"bool",result)
-                else:
-                    errorMessage("Wrong types of operands in OR",53)
-            elif instruction[2].attrib["type"] == "var":
-                var = getVar(instruction[2].text)
-                if var[0] == "bool" and instruction[1].attrib["type"] == "bool":
-                    result = bool(var[1]) or bool(instruction[1].text)
-                    identifFrame(instruction[0].text,"bool",result)
-                else:
-                    errorMessage("Wrong types of operands in OR",53)
-
-            elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-                var1 = getVar(instruction[1].text) # 0. - typ      1. - hodnota
-                var2 = getVar(instruction[2].text) # 0. - typ      1. - hodnota
-                if var1[0] == "bool" and var2[0] == "bool":
-                    result = bool(var1[1]) or bool(var2[1])
-                    identifFrame(instruction[0].text,"bool",result)
-                else:
-                    errorMessage("Wrong types of operands in OR",53)
+                    operand1 = False
+            elif var[0] == "nil":
+                operand1 = None
+            elif var[0] == "string":
+                operand1 = replaceEscapeSeq(var[1])
             else:
-                if instruction[1].attrib["type"] == "bool" and instruction[2].attrib["type"] == "bool":
-                    result = bool(instruction[1].text) or bool(instruction[2].text)
-                    identifFrame(instruction[0].text,"bool",result)
+                errorMessage("Wrong types",53)
+        else:
+            errorMessage("Wrong types",53)
+        if instruction[2].attrib["type"] == "int":
+            operand2 = int(instruction[2].text)
+        elif instruction[2].attrib["type"] == "bool":
+            if instruction[2].text == "true":
+                operand2 = True
+            else:
+                operand2 = False
+        elif instruction[2].attrib["type"] == "string":
+            operand2 = replaceEscapeSeq(instruction[2].text)
+        elif instruction[2].attrib["type"] == "nil":
+            operand2 = None
+        elif instruction[2].attrib["type"] == "var":
+            var = getVar(instruction[2].text)
+            if var[0] == "int":
+                operand2 = int(var[1])
+            elif var[0] == "bool":
+                if var[1] == "true":
+                    operand2 = True
                 else:
-                    errorMessage("Wrong types of operands in OR",53)
+                    operand2 = False
+            elif var[0] == "nil":
+                operand2 = None
+            elif var[0] == "string":
+                operand2 = replaceEscapeSeq(var[1])
+            else:
+                errorMessage("Wrong types",53)
+        else:
+            errorMessage("Wrong types",53)
+        if type(operand1) != type(None) and type(operand2) != type(None):
+            if type(operand1) != type(operand2):
+                errorMessage("Wrong type",53)
+
+            result = operand1 == operand2
+            if result == True:
+                result = "true"
+            else:
+                result = "false"
+            identifFrame(instruction[0].text,"bool",result)
+        else:
+            result = operand1 == operand2
+            if result == True:
+                result = "true"
+            else:
+                result = "false"
+            identifFrame(instruction[0].text,"bool",result)
+############################################ AND  OR #################################################
+    elif instruction.attrib["opcode"].upper() in ["AND","OR"]:
+        if instruction[1].attrib["type"] == "var":
+            var = getVar(instruction[1].text)
+            if var[0] == "bool":
+                if var[1] == "true":
+                    operand1 = True
+                else:
+                    operand1 = False
+            else:
+                errorMessage("Wrong types in AND or OR 676",53)
+        elif instruction[1].attrib["type"] == "bool":
+            if instruction[1].text == "true":
+                operan1 = True
+            else:
+                operand1 = False
+        else:
+            errorMessage("wron types in AND or OR 683",53)
+        if instruction[2].attrib["type"] == "var":
+            var = getVar(instruction[2].text)
+            if var[0] == "bool":
+                if var[1] == "true":
+                    operand2 = True
+                else:
+                    operand2 = False
+            else:
+                errorMessage("Wrong types in AND or OR 598",53)
+        elif instruction[2].attrib["type"] == "bool":
+            if instruction[2].text == "true":
+                operan2 = True
+            else:
+                operand2 = False
+        else:
+            errorMessage("wron types in AND or OR 699",53)
+        if type(operand1) == type(operand2):
+            if instruction.attrib["opcode"].upper() == "AND":
+                result = operand1 and operand2
+                if result == True:
+                    result = "true"
+                else:
+                    result = "false"
+                identifFrame(instruction[0].text,"bool",result)
+            elif instruction.attrib["opcode"].upper() == "OR":
+                result = operand1 or operand2
+                if result == True:
+                    result = "true"
+                else:
+                    result = "false"
+                identifFrame(instruction[0].text,"bool",result)
+        else:
+            errorMessage("Wrong types 716",53)
+
+
 ####################################### NOT ################################################
     elif instruction.attrib["opcode"].upper() == "NOT":
             if instruction[1].attrib["type"] == "var":
                 var = getVar(instruction[1].text)
                 if var[0] == "bool":
-                    result = not bool(var[1])
-                    identifFrame(instruction[0].text,"bool",result)
+                    if var[1] == "true":
+                        result = "false"
+                    else:
+                        result = "true"
                 else:
                     errorMessage("Wrong types of operands in NOT",53)
+            elif instruction[1].attrib["type"] == "bool":
+                if instruction[1].text == "true":
+                    result = "false"
+                else:
+                    result = "true"
+
             else:
-                if instruction[1].attrib["type"] == "bool":
-                    result = not bool(instruction[1].text)
-                    identifFrame(instruction[0].text,"bool",result)
-                else:
-                    errorMessage("Wrong types of operands in NOT",53)
+                errorMessage("Wrong types of operands in NOT",53)
+            identifFrame(instruction[0].text,"bool",result)
+
 ################################ INT2CHAR ######################################################
     elif instruction.attrib["opcode"].upper() == "INT2CHAR":
         if instruction[1].attrib["type"] == "var":
@@ -717,61 +691,37 @@ while counter < counter_order - 1:
 ####################################### STRI2INT #################################################š
     elif instruction.attrib["opcode"].upper() == "STRI2INT":
 
-        if instruction[1].attrib["type"] == "var":
-            var = getVar(instruction[1].text)
-            if var[0] == "string" and instruction[2].attrib["type"] == "int":
+        if instruction[1].attrib["type"] == "string":
+            stringValue = replaceEscapeSeq(instruction[1].text)
 
-                var[1] = replaceEscapeSeq(var[1])
-                intValue = int(instruction[2].text)
-                if 0 <= intValue < len(var[1]):
-                    ordasci = [ord(c) for c in var[1]]
-                    result = ordasci[intValue]
-                    identifFrame(instruction[0].text,"int",result)
-                else:
-                    errorMessage("Out of range in STRI2INT",58)
+        elif instruction[1].attrib["type"] == "var":
+            var = getVar(instruction[1].text)
+            if var[0] == "string":
+                stringValue = replaceEscapeSeq(var[1])
             else:
-                errorMessage("Wrong types of operands STRI2INT",53)
+                errorMessage("Wrong types",53)
+        else:
+            errorMessage("Wrong types",53)
+
+        if instruction[2].attrib["type"] == "int":
+            intValue = int(instruction[2].text)
+
         elif instruction[2].attrib["type"] == "var":
             var = getVar(instruction[2].text)
-            if var[0] == "string" and instruction[1].attrib["type"] == "int":
-
-                var[1] = replaceEscapeSeq(var[1])
-                intValue = int(instruction[1].text)
-                if 0 <= intValue < len(var[1]):
-                    ordasci = [ord(c) for c in var[1]]
-                    result = ordasci[intValue]
-                    identifFrame(instruction[0].text,"int",result)
-                else:
-                    errorMessage("Out of range in STRI2INT",58)
+            if var[0] == "int":
+                intValue = int(var[1])
             else:
-                errorMessage("Wrong types of operands in STRI2INT",53)
-        elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var = getVar(instruction[1].text)
-            var2 = getVar(instruction[2].text)
-            if var[0] == "string" and var2[0] == "int":
-
-                var[1] = replaceEscapeSeq(var[1])
-                if 0 <= var2[1] < len(var[1]):
-                    ordasci = [ord(c) for c in var[1]]
-                    result = ordasci[var2[1]]
-                    identifFrame(instruction[0].text,"int",result)
-                else:
-                    errorMessage("Out of range in STRI2INT",58)
-            else:
-                errorMessage("Wrong type of operands in STRI2INT",53)
+                errorMessage("Wrong types",53)
         else:
-            if instruction[1].attrib["type"] == "string" and instruction[2].attrib["type"] == "int":
-                stringValue = instruction[1].text
-                stringValue = replaceEscapeSeq(instruction[1].text)
-                intValue = int(instruction[2].text)
-                if 0 <= intValue < len(stringValue):
-                    ordasci = [ord(c) for c in stringValue]
-                    result = ordasci[intValue]
-                    identifFrame(instruction[0].text,"int",result)
-                else:
-                    errorMessage("Out of range in STR2INT",58)
-            else:
-                errorMessage("Wrong types of operands in STRI2INT",53)
+            errorMessage("Wrong types",53)
+
+        if 0 <= intValue < len(stringValue):
+            ordasci = [ord(c) for c in stringValue]
+            result = ordasci[intValue]
+            identifFrame(instruction[0].text,"int",result)
+        else:
+            errorMessage("Out of range in STRI2INT",58)
+
 #################################### EXIT ###################################################
     elif instruction.attrib["opcode"].upper() == "EXIT":
             if instruction[0].attrib["type"] == "int":
@@ -790,40 +740,38 @@ while counter < counter_order - 1:
                 errorMessage("Spatna ciselna hodnota instrukcie EXIT",57)
 #################################### CONCAT ###################################################
     elif instruction.attrib["opcode"].upper() == "CONCAT": # <var> <symb1> <symb2>
-        if instruction[1].attrib["type"] == "var":
+        if instruction[1].attrib["type"] == "string":
+            operand1 = replaceEscapeSeq(instruction[1].text)
+
+        elif instruction[1].attrib["type"] == "var":
             var = getVar(instruction[1].text)
-            if var[0] == "string" and instruction[2].attrib["type"] == "string":
-                var[1] = replaceEscapeSeq(var[1])
-                result = var[1] + instruction[2].text
-                identifFrame(instruction[0].text,"string",result)
+            if var[0] == "string":
+                operand1 = replaceEscapeSeq(var[1])
             else:
-                errorMessage("Wrong type in Concat",53)
+                errorMessage("Wrong types",53)
+        else:
+            errorMessage("Wrong types",53)
+
+        if instruction[2].attrib["type"] == "string":
+            operand2 = replaceEscapeSeq(instruction[2].text)
+
         elif instruction[2].attrib["type"] == "var":
             var = getVar(instruction[2].text)
-            if var[0] == "string" and instruction[1].attrib["type"] == "string":
-                var[1] = replaceEscapeSeq(var[1])
-                result = var[1] + instruction[1].text
-                identifFrame(instruction[0].text,"string",result)
+            if var[0] == "string":
+                operand2 = replaceEscapeSeq(var[1])
             else:
-                errorMessage("Wrong type in Concat",53)
-        elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var1 = getVar(instruction[1].text)
-            var2 = getVar(instruction[2].text)
-            if var1[0] == "string" and var2[0] == "string":
-                var1[1] = replaceEscapeSeq(var1[1])
-                var2[1] = replaceEscapeSeq(var2[1])
-                result = var1[1] + var2[1]
-                identifFrame(instruction[0].text,"string",result)
-            else:
-                errorMessage("Wrong type in CONCAT",53)
+                errorMessage("Wrong types",53)
         else:
-              if instruction[1].attrib["type"] != "string" or instruction[2].attrib["type"] != "string":
-                  errorMessage("CONCAT: symb1 and symb2 type: string",53)
-              else:
-                 symb1 = replaceEscapeSeq(instruction[1].text)
-                 symb2 = replaceEscapeSeq(instruction[2].text)
-                 result = symb1 + symb2
-                 identifFrame(instruction[0].text,"string",result)
+            errorMessage("Wrong types",53)
+
+        if type(operand1) == type(operand2):
+            result = operand1 + operand2
+            identifFrame(instruction[0].text,"string",result)
+
+        else:
+            errorMessage("Wrong types",53)
+
+
 ########################################### STRLEN ############################################
     elif instruction.attrib["opcode"].upper() == "STRLEN":
         if instruction[1].attrib["type"] == "var":
@@ -833,145 +781,93 @@ while counter < counter_order - 1:
                 result = int(len(var[1]))
                 identifFrame(instruction[0].text,"int",result)
             else:
-                errorMessage("Wrong type in STRLEN",53)
+                errorMessage("Wrong type in STRLEN a",53)
         elif instruction[1].attrib["type"] == "string":
             symb1 = replaceEscapeSeq(instruction[1].text)
             result = int(len(symb1))
             identifFrame(instruction[0].text,"int",result)
         else:
-            errorMessage("Wrong type in STRLEN",53)
+            errorMessage("Wrong type in STRLEN b",53)
 ####################################### GETCHAR #############################################
     elif instruction.attrib["opcode"].upper() == "GETCHAR":
-        if instruction[1].attrib["type"] == "var":
+
+        if instruction[1].attrib["type"] == "string":
+            stringValue = replaceEscapeSeq(instruction[1].text)
+
+        elif instruction[1].attrib["type"] == "var":
             var = getVar(instruction[1].text)
-            if var[0] == "string" and instruction[2].attrib["type"] == "int":
-                var[1] = replaceEscapeSeq(var[1])
-                intValue = int(instruction[2].text) #int hodnota
-                if 0 <= intValue < len(var[1]):
-                    listStringvalue = list(var[1])
-                    result = listStringvalue[intValue]
-                    identifFrame(instruction[0].text,"string",result)
-                else:
-                    errorMessage("Out of range in GETCHAR",58)
-            else:
-                errorMessage("Wrong type in GETCHAR",53)
-        elif  instruction[2].attrib["type"] == "var":
-            var = getVar(instruction[2].text)
-            if var[0] == "string" and instruction[1].attrib["type"] == "int":
-                var[1] = replaceEscapeSeq(var[1])
-                intValue = int(instruction[1].text) #int hodnota
-                if 0 <= intValue < len(var[1]):
-                    listStringvalue = list(var[1])
-                    result = listStringvalue[intValue]
-                    identifFrame(instruction[0].text,"string",result)
-                else:
-                    errorMessage("Out of range in GETCHAR",58)
-            else:
-                errorMessage("Wrong type in GETCHAR",53)
-        elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var1 = getVar(instruction[1].text)
-            var2 = getVar(instruction[2].text)
-            if var1[0] == "string" and var2[0] == "int":
-
-                var1[1] = replaceEscapeSeq(var1[1])
-
-                if 0 <= var2[1] < len(var1[1]):
-                    listStringvalue = list(var1[1])
-                    result = listStringvalue[var2[1]]
-                    identifFrame(instruction[0].text,"string",result)
-                else:
-                    errorMessage("Out of range in GETCHAR",58)
-            else:
-                errorMessage("Wrong type in GETCHAR",53)
-        else:
-            if instruction[1].attrib["type"] == "string" and instruction[2].attrib["type"] == "int":
-                stringValue = instruction[1].text
-                stringValue = replaceEscapeSeq(instruction[1].text)
-                intValue = int(instruction[2].text)
-                if 0 <= intValue < len(stringValue):
-                    listStringvalue = list(stringValue)
-                    result = listStringvalue[intValue]
-                    identifFrame(instruction[0].text,"string",result)
-                else:
-                    errorMessage("Out of range in GETCHAR",58)
-            else:
-                 errorMessage("GETCHAR: symb1: string, symb2 : int",53)
-########################################## SETCHAR #############################################
-    elif instruction.attrib["opcode"].upper() == "SETCHAR":
-        if instruction[0].attrib["type"] == "var" and instruction[1].attrib["type"] == "var":
-            string = getVar(instruction[0].text)
-            index = getVar(instruction[1].text)
-            char = instruction[2].text
-            if string[0] == "string" and index[0] == "int" and char == "string":
-                string[1] = replaceEscapeSeq(string[1])
-                char = replaceEscapeSeq(instruction[2].text)
-                if 0 <= index[1] < len(string[1]):
-                    if char != "":
-                        result = string[1][:index[1]] + char[0] + string[1][index[1] +1:]  #orezeme podla indexu cize ked mame ahoj a idndex bude 2 tak bude ah pridame 0znak napr a cize aha a plus to co tam bolo
-                        identifFrame(instruction[0].text,"string",result)
-                    else:
-                        errorMessage("String is empty in SETCHAR",58)
-                else:
-                    errorMessage("Out of range in SETCHAR",58)
-
-            else:
-                errorMessage("Wrong types in SETCHAR",53)
-        elif instruction[0].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            string = getVar(instruction[0].text)
-            char = getVar(instruction[2].text)
-            index = int(instruction[1].text)
-            if string[0] == "string" and index == "int" and char[0] == "string":
-                string[1] = replaceEscapeSeq(string[1])
-                char[1] = replaceEscapeSeq(char[1])
-                if 0 <= index < len(string[1]):
-                    if char[1] != "":
-                        result = string[1][:index] + char[1][0] + string[1][index + 1:]
-                        identifFrame(instruction[0].text,"string",result)
-                    else:
-                        errorMessage("String is empty in SETCHAR",58)
-                else:
-                    errorMessage("Out of range in SETCHAR",58)
-
+            if var[0] == "string":
+                stringValue = replaceEscapeSeq(var[1])
             else:
                 errorMessage("Wrong types",53)
-        elif instruction[0].attrib["type"] == "var" and instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            string = getVar(instruction[0].text)
-            index = getVar(instruction[1].text)
-            char = getVar(instruction[2].text)
-            if string[0] == "string" and index[0] == "int" and char[0] == "string":
-
-                string[1] = replaceEscapeSeq(string[1])
-                char[1] = replaceEscapeSeq(char[1])
-                if 0 <= index[1] < len(string[1]):
-                    if char[1] != "":
-                        result = string[1][:index[1]] + char[1][0] + string[1][index[1] + 1:]
-                        identifFrame(instruction[0].text,"string",result)
-                    else:
-                        errorMessage("String is empty in SETCHAR",58)
-                else:
-                    errorMessage("out of range in SETCHAR",58)
-            else:
-                errorMessage("Wrong types in SETCHAR",53)
-
         else:
-            if instruction[0].attrib["type"] == "var" and instruction[1].attrib["type"] == "int" and instruction[2].attrib["type"] == "string":
-                string = getVar(instruction[0].text)
-                if string[0] == "string":
+            errorMessage("Wrong types",53)
 
-                    index = int(instruction[1].text)
-                    char = instruction[2].text
-                    string[1] = replaceEscapeSeq(string[1])
-                    char = replaceEscapeSeq(instruction[2].text)
-                    if 0 <= index < len(string[1]):
-                        if char != "":
-                            result = string[1][:index] + char[0] + string[1][index + 1:]
-                            identifFrame(instruction[0].text,"string",result)
-                        else:
-                            errorMessage("String is empty:symb2 in SETCHAR",58)
-                    else:
-                        errorMessage("Out of range in SETCHAR",58)
+        if instruction[2].attrib["type"] == "int":
+            intValue = int(instruction[2].text)
+
+        elif instruction[2].attrib["type"] == "var":
+            var = getVar(instruction[2].text)
+            if var[0] == "int":
+                intValue = int(var[1])
             else:
-                 errorMessage("Wrong type in SETCHAR :symb1 = int, symb2 = string",53)
+                errorMessage("Wrong types",53)
+        else:
+            errorMessage("Wrong types",53)
+
+        if 0 <= intValue < len(stringValue):
+            listStringvalue = list(stringValue)
+            result = listStringvalue[intValue]
+            identifFrame(instruction[0].text,"string",result)
+        else:
+            errorMessage("Out of range in GETCHAR",58)
+
+########################################## SETCHAR #############################################
+    elif instruction.attrib["opcode"].upper() == "SETCHAR":
+
+        if instruction[0].attrib["type"] == "var":
+            stringVar = getVar(instruction[0].text)
+            if stringVar[0] == "string":
+                if stringVar[1] != "":
+                    stringVar = replaceEscapeSeq(stringVar[1])
+                else:
+                    errorMessage("String in var is empty",58)
+            else:
+                errorMessage("Wrong types 836",53)
+        else:
+            errorMessage("Wrong types 838",53)
+        if instruction[1].attrib["type"] == "int":
+            index = int(instruction[2].text)
+        elif instruction[1].attrib["type"] == "var":
+            index = getVar(instruction[1].text)
+            if index[0] == "int":
+                index = int(index[1])
+            else:
+                errorMessage("Wrong types 846",53)
+        else:
+            errorMessage("Wrong types 848",53)
+
+        if instruction[2].attrib["type"] == "string":
+            if instruction[2].text != "":
+                char = replaceEscapeSeq(instruction[1].text)
+            else:
+                errorMessage("String in symb2 is emepty",58)
+
+        elif instruction[2].attrib["type"] == "var":
+            char = getVar(instruction[2].text)
+            if char[0] == "string":
+                if char[1] != "":
+                    char = replaceEscapeSeq(char[1])
+                else:
+                    errorMessage("String in var is empty",58)
+            else:
+                errorMessage("Wrong types 864",53)
+        else:
+            errorMessage("Wrong types 866",53)
+
+
+        result = stringVar[:index] + char[0] + stringVar[index + 1:]
+        identifFrame(instruction[0].text,"string",result)
 ######################################## TYPE ###############################################################
     elif instruction.attrib["opcode"].upper() == "TYPE": # <var> <symb>
 
@@ -1053,6 +949,8 @@ while counter < counter_order - 1:
 
 ################################################ PUSHFRAME ######################################################
     elif instruction.attrib["opcode"].upper() == "PUSHFRAME":
+        if TF == None:
+            errorMessage("Access to undefined temporary frame",55)
         LF.append(TF)
         TF = None
 
@@ -1093,7 +991,7 @@ while counter < counter_order - 1:
         try:
             counter = callStack.pop()
         except IndexError as err:
-            errorMessage(err.args[0],55)
+            errorMessage(err.args[0],56)
         continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
 ###################################### JUMP ###########################################################
     elif instruction.attrib["opcode"].upper() == "JUMP":
@@ -1103,115 +1001,85 @@ while counter < counter_order - 1:
             counter = Labels.get(instruction[0].text)
             continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
 ####################################### JUMPIFEQ <label> <symb1> <symb2> ###############################################
-    elif instruction.attrib["opcode"].upper() == "JUMPIFEQ":
-        if instruction[1].attrib["type"] == "var":
-            var = getVar(instruction[1].text) # symb1 = var
-            if var[0] == instruction[2].attrib["type"] and var[1] == instruction[2].text:
-                if var[0] == "string":
-                    var[1] = replaceEscapeSeq(var[1])
-                if instruction[0].text not in Labels:
-                    errorMessage("undefined label",52)
-                else:
-                    counter = Labels.get(instruction[0].text)
-                    continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+    elif instruction.attrib["opcode"].upper() in ["JUMPIFEQ","JUMPIFNEQ"]:
+        if instruction[1].attrib["type"] == "int":
+            operand1 = int(instruction[1].text)
+        elif instruction[1].attrib["type"] == "bool":
+            if instruction[1].text == "true":
+                operand1 = True
             else:
-                errorMessage("ERROR JUMPIFEQ",53)
-
-        elif instruction[2].attrib["type"] == "var":
-            var = getVar(instruction[2].text) # symb2 = var
-            if var[0] == instruction[1].attrib["type"] and var[1] == instruction[1].text:
-                if var[0] == "string":
-                    var[1] = replaceEscapeSeq(var[1])
-                if instruction[0].text not in Labels:
-                    errorMessage("undefined label",52)
+                operand1 = False
+        elif instruction[1].attrib["type"] == "string":
+            operand1 = replaceEscapeSeq(instruction[1].text)
+        elif instruction[1].attrib["type"] == "nil":
+            operand1 = None
+        elif instruction[1].attrib["type"] == "var":
+            var = getVar(instruction[1].text)
+            if var[0] == "int":
+                operand1 = int(var[1])
+            elif var[0] == "bool":
+                if var[1] == "true":
+                    operand1 = True
                 else:
-                    counter = Labels.get(instruction[0].text)
-                    continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+                    operand1 = False
+            elif var[0] == "string":
+                operand1 = replaceEscapeSeq(var[1])
+            elif var[0] == "nil":
+                operand2 = None
             else:
-                errorMessage("ERROR JUMPIFEQ",53)
-        elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-            var1 = getVar(instruction[1].text) # symb1 = var
-            var2 = getVar(instruction[2].text) # symb2 = var
-            if var1[0] == var2[0] and va1r[1] == var2[1]:
-                if var1[0] == "string":
-                    var1[1] = replaceEscapeSeq(var1[1])
-                elif var2[0] == "string":
-                    var2[1] = replaceEscapeSeq(var2[1])
-                if instruction[0].text not in Labels:
-                    errorMessage("undefined label",52)
-                else:
-                    counter = Labels.get(instruction[0].text)
-                    continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
-            else:
-                errorMessage("ERROR JUMPIFEQ",53)
+                errorMessage("Wrong types",53)
         else:
-            if instruction[1].attrib["type"] == instruction[2].attrib["type"] and instruction[1].text == instruction[2].text:
-                if instruction[1].attrib["type"] == "string":
-                    instruction[1].text = replaceEscapeSeq(instruction[1].text)
-                elif instruction[2].attrib["type"] == "string":
-                    instruction[2].text = replaceEscapeSeq(instruction[2].text)
-                if instruction[0].text not in Labels:
-                    errorMessage("undefined label",52)
-                else:
-                    counter = Labels.get(instruction[0].text)
-                    continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+            errorMessage("Wrong types",53)
+        if instruction[2].attrib["type"] == "int":
+            operand2 = int(instruction[2].text)
+        elif instruction[2].attrib["type"] == "bool":
+            if instruction[2].text == "true":
+                operand2 = True
             else:
-                errorMessage("Wrong type in JUMPIFEQ",53)
-############################################### JUMPIFNEQ ########################################################
-    elif instruction.attrib["opcode"].upper() == "JUMPIFNEQ":
-         if instruction[1].attrib["type"] == "var":
-             var = getVar(instruction[1].text) # symb1 = var
-             if var[0] == instruction[2].attrib["type"] and var[1] != instruction[2].text:
-                 if var[0] == "string":
-                     var[1] = replaceEscapeSeq(var[1])
-                 if instruction[0].text not in Labels:
-                     errorMessage("undefined label",52)
-                 else:
-                     counter = Labels.get(instruction[0].text)
-                     continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
-             else:
-                 errorMessage("wrong type in JUMPIFNEQ",53)
+                operand2 = False
+        elif instruction[2].attrib["type"] == "string":
+            operand2 = replaceEscapeSeq(instruction[2].text)
+        elif instruction[2].attrib["type"] == "nil":
+            operand2 = None    
+        elif instruction[2].attrib["type"] == "var":
+            var = getVar(instruction[2].text)
+            if var[0] == "int":
+                operand2 = int(var[1])
+            elif var[0] == "bool":
+                if var[1] == "true":
+                    operand2 = True
+                else:
+                    operand2 = False
+            elif var[0] == "string":
+                operand2 = replaceEscapeSeq(var[1])
+            elif var[0] == "nil":
+                operand2 = None
+            else:
+                errorMessage("Wrong types",53)
+        else:
+            errorMessage("Wrong types",53)
+        if type(operand1) == type(operand2):
+            if instruction.attrib["opcode"].upper() == "JUMPIFEQ":
+                result = operand1 == operand2
+                if result:
+                    if instruction[0].text not in Labels:
+                        errorMessage("undefined label",52)
+                    else:
+                        counter = Labels.get(instruction[0].text)
+                        continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
 
-         elif instruction[2].attrib["type"] == "var":
-             var = getVar(instruction[2].text) # symb2 = var
-             if var[0] == instruction[1].attrib["type"] and var[1] != instruction[1].text:
-                 if var[0] == "string":
-                     var[1] = replaceEscapeSeq(var[1])
-                 if instruction[0].text not in Labels:
-                     errorMessage("undefined label",52)
-                 else:
-                     counter = Labels.get(instruction[0].text)
-                     continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
-             else:
-                 errorMessage("wrong type in JUMPIFNEQ",53)
-         elif instruction[1].attrib["type"] == "var" and instruction[2].attrib["type"] == "var":
-             var1 = getVar(instruction[1].text) # symb1 = var
-             var2 = getVar(instruction[2].text) # symb2 = var
-             if var1[0] == var2[0] and va1r[1] != var2[1]:
-                 if var1[0] == "string":
-                     var1[1] = replaceEscapeSeq(var1[1])
-                 elif var2[0] == "string":
-                     var2[1] = replaceEscapeSeq(var2[1])
-                 if instruction[0].text not in Labels:
-                     errorMessage("undefined label",52)
-                 else:
-                     counter = Labels.get(instruction[0].text)
-                     continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
-             else:
-                 errorMessage("WRONG TYPE IN JUMPIFNEQ",53)
-         else:
-             if instruction[1].attrib["type"] == instruction[2].attrib["type"] and instruction[1].text != instruction[2].text:
-                 if instruction[1].attrib["type"] == "string":
-                     instruction[1].text = replaceEscapeSeq(instruction[1].text)
-                 elif instruction[2].attrib["type"] == "string":
-                     instruction[2].text = replaceEscapeSeq(instruction[2].text)
-                 if instruction[0].text not in Labels:
-                     errorMessage("undefined label",52)
-                 else:
-                     counter = Labels.get(instruction[0].text)
-                     continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
-             else:
-                 errorMessage("WRONG TYPE IN JUMPIFNEQ",53)
+
+            elif instruction.attrib["opcode"].upper() == "JUMPIFNEQ":
+                result = not operand1 == operand2
+                if result:
+                    if instruction[0].text not in Labels:
+                        errorMessage("undefined label",52)
+                    else:
+                        counter = Labels.get(instruction[0].text)
+                        continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
+        else:
+            errorMessage("Wrong types",53)
+
 
 ######################################################## PUSHS #####################################################
     elif instruction.attrib["opcode"].upper() == "PUSHS":
@@ -1224,22 +1092,19 @@ while counter < counter_order - 1:
 ########################################################## POPS ####################################################
     elif instruction.attrib["opcode"].upper() == "POPS": # TODO
         if instruction[0].attrib["type"] == "var":
-            var = getVar(instruction[0].text)
-            if var[0] == "string":
-                var[1] = replaceEscapeSeq(var[1])
             try:
                 var = dataStack.pop()
             except IndexError as err:
                 errorMessage(err.args[0],56)
             identifFrame(instruction[0].text,var[0],var[1])
         else:
-            errorMessage("Wrong type in POPS",53)
+            errorMessage("Wrong type in POPS",32)
 ############################################ READ ##################################################################
     elif instruction.attrib["opcode"].upper() == "READ": #var type
         if STDINInput: #ak je STDIN input true
             inputl = input()
         else:
-            inputl = input.readline().split("\n")[0]
+            inputl = argv_input.readline().split("\n")[0]
         check_typebool = re.search("^true",inputl,re.IGNORECASE) #regulak pre bool hlada true a je jedno ci True alebo true alebo TRUE
         check_typestring = re.search("([^\ \\\\#]|\\\\[0-9]{3})*$",inputl)
         check_typeint = re.search("^((\+|-)?[0-9]\d*)$",inputl)
@@ -1283,6 +1148,8 @@ while counter < counter_order - 1:
         elif instruction[0].attrib["type"] == "string":
             instruction[0].text = replaceEscapeSeq(instruction[0].text)
             print(instruction[0].text,end='')
+        elif instruction[0].attrib["type"] == "nil":
+            print("",end='')
         elif instruction[0].attrib["type"] == "var":
             var = getVar(instruction[0].text)
 
@@ -1297,11 +1164,9 @@ while counter < counter_order - 1:
                 else:
                     print("false",end='')
             elif var[0] == "nil":
-                print(var[1],end='')
+                print("",end='')
             else:
                 errorMessage("Wrong type in WRITE",53)
-        elif instruction[0].attrib["type"] == "nil":
-            print(instruction[0].text, end='')
         else:
             errorMessage("Wrong type in WRITE",53)
 
