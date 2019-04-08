@@ -217,7 +217,7 @@ class Test extends CheckArgumentsAndError
             if($rc == false)
             {
                 exec("touch ". $daco["dirname"] . "/". $daco["filename"].".rc",$output,$return_var); //aby sme mohli skontrolovat ci sa vie vygenerovat alebo nie output tam musi byt neni to nic a return var tam je ta navratova hodnota
-                exec("echo 0 >>" .  $daco["dirname"]."/".$daco["filename"].".rc");
+                exec("echo 0 >" .  $daco["dirname"]."/".$daco["filename"].".rc");
                 if($return_var == 1)
                 {
                     CheckArgumentsAndError::errorMessage("Couldn´t generate .rc file",12);
@@ -241,81 +241,87 @@ class Test extends CheckArgumentsAndError
             {
                 CheckArgumentsAndError::errorMessage("Couldn´t make temporary file for both parse and interpret",12);
             }
+            exec("touch ./tempoutput",$output,$return_var);
+            if($return_var == 1)
+            {
+                CheckArgumentsAndError::errorMessage("Couldn´t make temporary file for both parse and interpret",12);
+            }
+
             $rc = file_get_contents($daco["dirname"]."/".$daco["filename"].".rc"); // nacitanie obsahu rc
 
             if($daco["basename"] == $daco["filename"].".src")
             {
                 if($this->parseonly == true)
                 {
-                    exec("php7.3 ".$this->parser. "< ".$daco["dirname"]."/".$daco["filename"].".src > ./tempfileparse",$output,$ret_parse);
+                    exec("php7.3 ".$this->parser. "< \"".$daco["dirname"]."/".$daco["filename"].".src\" > ./tempfileparse",$output,$ret_parse);
                     if($rc == $ret_parse)
                     {
-                        exec("java -jar /pub/courses/ipp/jexamxml/jexamxml.jar tempfileparse ".$daco["dirname"]."/".$daco["filename"].".out /pub/courses/ipp/jexamxml/options",$output,$ret_parse);
+                        exec("java -jar /pub/courses/ipp/jexamxml/jexamxml.jar tempfileparse \"".$daco["dirname"]."/".$daco["filename"].".out\" /pub/courses/ipp/jexamxml/options",$output,$ret_parse);
                         if($ret_parse == 0)
                         {
 
-                            print("TEST:".$daco["basename"].": PASSED\n");
+                            print("TEST:\t\t".$daco["basename"].":\t\tPASSED\n");
                             //    $this->passedarray = $daco["basename"];
                             $this->testPassed++;
 
                         }
                         else
                         {
-                            print("TEST ".$daco["basename"].": FAILED\n");
+                            print("TEST:\t\t".$daco["basename"].":\t\tFAILED\n");
                             $this->testFail++;
 
                         }
                     }
                     else
                     {
-                        print("TEST RC FAILED:".$daco["basename"].": FAILED\n");
+                        print("TEST RC FAILED\t\t:".$daco["basename"].":\t\tFAILED\n");
                         $this->testFail++;
                     }
                 }
                 elseif($this->intonly == true)
                 {
-                    exec("python3.6".$this->interpret. "--source=".$daco["dirname"]."/". "--input=".$daco["dirname"]."/".$daco["filename"]. ".in > ./tempfileint",$output,$rc_return_var);
+                    exec("python3 ".$this->interpret. " --source=\"".$daco["dirname"]."/".$daco["filename"].".src\"  --input=\"".$daco["dirname"]."/".$daco["filename"].".in\" > ./tempfileint",$output,$rc_return_var);
                     if($rc == $rc_return_var)
                     {
-                        exec("diff ". $daco["dirname"]."/".$daco["filename"].".out tempfileint",$output,$diff_ret);
+                        exec("diff \"".$daco["dirname"]."/".$daco["filename"].".out\" tempfileint",$output,$diff_ret);
                         if($diff_ret == 0)
                         {
-                            print("TEST:".$daco["basename"]." PASSED\n");
+                            print("TEST DIFF:\t\t".$daco["basename"]."\t\tPASSED\n");
                             $this->testPassed++;
                         }
                         else
                         {
-                            print("TEST ".$daco["basename"].": FAILED\n");
+                            print("TEST DIFF\t\t".$daco["basename"].":\t\tFAILED\n");
                             $this->testFail++;
                         }
                     }
                     else
                     {
-                        print("TEST RC:".$daco["basename"].": FAILED\n");
+                        print("TEST RC:\t\t".$daco["basename"].":\t\tFAILED\n");
                         $this->testFail++;
                     }
                 }
                 else
                 {
-                    exec("php7.3 ".$this->parser. "< ".$daco["dirname"]."/".".src > ./tempfileboth");
-                    exec("python3.6".$this->interpret. "--source=".$daco["dirname"]."/". "--input=".$daco["dirname"]."/".$daco["filename"]. ".in > ./tempfileboth",$output,$rc_return_var);
+                    exec("php7.3 ".$this->parser. "< \"".$daco["dirname"]."/".$daco["filename"].".src\" > ./tempfileboth");
+                    exec("python3.6 ".$this->interpret. " --source=\"./tempfileboth\"  --input=\"".$daco["dirname"]."/".$daco["filename"].".in\" > ./tempoutput",$output,$rc_return_var);
                     if($rc == $rc_return_var)
                     {
-                        exec("diff ". $daco["dirname"].$daco["filename"]."/".".out tempfileboth",$output,$diff_ret);
+                        exec("diff \"".$daco["dirname"]."/".$daco["filename"].".out\" tempoutput",$output,$diff_ret);
                         if($diff_ret == 0)
                         {
-                            print("TEST:".$daco["basename"]." PASSED\n");
+                            print("TEST\t\t:".$daco["basename"]."\t\t\t\t PASSED\n");
                             $this->testPassed++;
                         }
                         else
                         {
-                            print("TEST ".$daco["basename"].": FAILED\n");
+                            print("TEST ".$daco["basename"].":\t\t\t FAILED\n");
                             $this->testFail++;
                         }
                     }
                     else
                     {
-                        print("TEST:".$daco["basename"].": FAILED\n");
+                        print("TEST:".$daco["basename"].":\t\t\tFAILED\n");
                         $this->testFail++;
                     }
                 }
@@ -325,6 +331,7 @@ class Test extends CheckArgumentsAndError
             exec("rm -rf ./tempfileparse");
             exec("rm -rf ./tempfileint");
             exec("rm -rf ./tempfileboth");
+            exec("rm -rf ./tempoutput");
             print("\nPOCET TESTOV:" .$this->testCounter."\n");
             print("POCET PREJDENYCH:".$this->testPassed);
             print("\nPOCET NEPREJDENYCH: ".$this->testFail."\n");
@@ -358,20 +365,52 @@ class Test extends CheckArgumentsAndError
 
 
 
-/*class HTMLgen
-{
-    public function generateHtmlPage()
-    {
-          // Tu bude HTML kod
+//class HTMLgen
+//{
+//    public function generateHtmlPage()
+//
+/*$html =
+        '<!doctype html>
+        <html lang=\"cz\">
+        <head>
+            <meta charset=\"utf-8\">
+            <title>IPPCODE19 TEST</title>
+            <meta name=\"TESTY PRE INTERPRET A PARSER\">
+            <meta name=\"RENE BOLF\">
 
-    }
-}*/
+            <style>
+                h1 {
+                    text-align: center;
+                    color: #676d6a;
+                }
+                .background-gray{
+                    background: #00000;
+                }
+                .failed {
+                    color: #e03d3d;
+                }
+                .passed {
+                    color: #00b700;
+                }
+                .center {
+                    text-align: center;
+                }
+                .left {
+                    text-align: left;
+                }
+            </style>
+        </head>
+        <body>;
+</html*/
+//echo $html;
+//    }
+//}
 $Argument = new CheckArgumentsAndError();
 //$Argument->parseArguments($argc,$argv);
 $Argument->checkFileExists();
-//$HtmlGenerator = new HTMLgen
-//$HtmlGenerator->generateHtmlPage();
 $test = new Test();
 $test->runTest();
+//$HtmlGenerator = new HTMLgen
+//$HtmlGenerator->generateHtmlPage();
 
  ?>

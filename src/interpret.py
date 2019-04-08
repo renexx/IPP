@@ -139,6 +139,10 @@ for instruction in root_program:
 # 0 operandov CREATEFRAME PUSHFRAME POPFRAME RETURN break
     if instruction.attrib["opcode"] in ["CREATEFRAME","PUSHFRAME","POPFRAME","RETURN","BREAK"]: #something like switch
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if(argument.tag != 0):
                 errorMessage("Wrong count of arguments in instruction: CREATEFRAME,PUSHFRAME,POPFRAME,RETURN,BREAK",32)
 ###################################################################################################################
@@ -146,6 +150,10 @@ for instruction in root_program:
     elif instruction.attrib["opcode"].upper() in ["DEFVAR","POPS"]:
         counter_arg = 0
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if "type" not in argument.attrib:
                 errorMessage("Missing type in instruction: DEFVAR,POPS",32)
             if(argument.tag == "arg1"):
@@ -163,6 +171,10 @@ for instruction in root_program:
     elif instruction.attrib["opcode"].upper() in ["PUSHS","WRITE","EXIT","DPRINT"]:
         counter_arg = 0
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if "type" not in argument.attrib:
                 errorMessage("Missing type in instruction: PUSHS, WRITE ,EXIT,DPRINT",32)
             if(argument.tag == "arg1"):
@@ -181,6 +193,10 @@ for instruction in root_program:
     elif instruction.attrib["opcode"].upper() in ["CALL","LABEL","JUMP"]:
         counter_arg = 0
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if "type" not in argument.attrib:
                 errorMessage("Missing type in instruction: CALL,LABEL,JUMP",32)
             if(argument.tag == "arg1"):
@@ -197,6 +213,10 @@ for instruction in root_program:
     elif instruction.attrib["opcode"].upper() in ["MOVE","INT2CHAR","TYPE","STRLEN","READ","NOT"]:
         counter_arg = 0
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if "type" not in argument.attrib:
                 errorMessage("Chyba type u MOVE,INT2CHAR,TYPE,STRLEN,READ,NOT",32)
             counter_arg += 1
@@ -206,6 +226,10 @@ for instruction in root_program:
     elif instruction.attrib["opcode"].upper() in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR","JUMPIFEQ","JUMPIFNEQ"]:
         counter_arg = 0
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if "type" not in argument.attrib:
                 errorMessage("Missing type in instruction: ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR,JUMPIFEQ,JUMPIFNEQ",32)
             counter_arg += 1
@@ -233,8 +257,12 @@ for instruction in root_program:
             errorMessage("Arguments are not in order in instruction:ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR,JUMPIFEQ,JUMPIFNEQ",32)
 
 # 2 operandy [var][symb]-int,string,bool,nil MOVE,INT2CHAR,TYPE,STRLEN
-    if instruction.attrib["opcode"].upper() in ["MOVE","INT2CHAR","TYPE","STRLEN,NOT"]:
+    if instruction.attrib["opcode"].upper() in ["MOVE","INT2CHAR","TYPE","STRLEN","NOT"]:
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("In instruction MOVE,INT2CHAR,TYPE,STRLEN, NOT have to be arg1 var",32)
@@ -251,6 +279,10 @@ for instruction in root_program:
 # 2 operandy [var][type] READ
     elif instruction.attrib["opcode"].upper() in ["READ"]:
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("In instruction READ has to be arg1 var",32)
@@ -266,6 +298,10 @@ for instruction in root_program:
 #3 operandy [var] [symb1] [symb2] symbol moze byt var, int, string, bool, nil ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,NOT,STRI2INT,CONCAT,GETCHAR,SETCHAR
     elif instruction.attrib["opcode"].upper() in ["ADD","SUB","MUL","IDIV","LT","GT","EQ","AND","OR","STRI2INT","CONCAT","GETCHAR","SETCHAR"]:
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "var"):
                     errorMessage("In instruction: ADD,SUB,MUL,IDIV,LT,GT,EQ,AND,OR,STRI2INT,CONCAT,GETCHAR,SETCHAR has to be arg1: var",32)
@@ -286,6 +322,10 @@ for instruction in root_program:
 #3 oprandy [label] [symb1] [symb2]   JUMPIFEQ JUMPIFNEQ
     elif instruction.attrib["opcode"].upper() in ["JUMPIFEQ","JUMPIFNEQ"]:
         for argument in instruction:
+            if len(argument) != 0:
+                errorMessage("Argument has an element",32)
+            if len(argument.attrib) != 1:
+                errorMessage("Bad attribute",32)
             if(argument.tag == "arg1"):
                 if(argument.attrib["type"] != "label"):
                     errorMessage("In instruction JUMPIFEQ and JUMPIFNEQ has to be arg1 label",32)
@@ -385,7 +425,6 @@ def replaceEscapeSeq(string):
 for instruction in root_program:
 ######################################## LABEL #######################################################
         if instruction.attrib["opcode"].upper() == "LABEL":
-
 
             if instruction[0].text in Labels:
                 errorMessage("Redefination of existing label",52)
@@ -836,8 +875,9 @@ while counter < counter_order - 1:
                 errorMessage("Wrong types 836",53)
         else:
             errorMessage("Wrong types 838",53)
+
         if instruction[1].attrib["type"] == "int":
-            index = int(instruction[2].text)
+            index = int(instruction[1].text)
         elif instruction[1].attrib["type"] == "var":
             index = getVar(instruction[1].text)
             if index[0] == "int":
@@ -849,7 +889,7 @@ while counter < counter_order - 1:
 
         if instruction[2].attrib["type"] == "string":
             if instruction[2].text != "":
-                char = replaceEscapeSeq(instruction[1].text)
+                char = replaceEscapeSeq(instruction[2].text)
             else:
                 errorMessage("String in symb2 is emepty",58)
 
@@ -865,9 +905,11 @@ while counter < counter_order - 1:
         else:
             errorMessage("Wrong types 866",53)
 
-
-        result = stringVar[:index] + char[0] + stringVar[index + 1:]
-        identifFrame(instruction[0].text,"string",result)
+        if 0 <= index < len(stringVar):
+            result = stringVar[:index] + char[0] + stringVar[index + 1:]
+            identifFrame(instruction[0].text,"string",result)
+        else:
+            errorMessage("Out of the bounds in SETCHAR",58)
 ######################################## TYPE ###############################################################
     elif instruction.attrib["opcode"].upper() == "TYPE": # <var> <symb>
 
@@ -1025,7 +1067,7 @@ while counter < counter_order - 1:
             elif var[0] == "string":
                 operand1 = replaceEscapeSeq(var[1])
             elif var[0] == "nil":
-                operand2 = None
+                operand1 = None
             else:
                 errorMessage("Wrong types",53)
         else:
@@ -1040,7 +1082,7 @@ while counter < counter_order - 1:
         elif instruction[2].attrib["type"] == "string":
             operand2 = replaceEscapeSeq(instruction[2].text)
         elif instruction[2].attrib["type"] == "nil":
-            operand2 = None    
+            operand2 = None
         elif instruction[2].attrib["type"] == "var":
             var = getVar(instruction[2].text)
             if var[0] == "int":
@@ -1174,4 +1216,3 @@ while counter < counter_order - 1:
 
     counter += 1
     counter_instruction += 1
-#dom.write("example.xml")
