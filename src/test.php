@@ -269,6 +269,11 @@ class Test extends CheckArgumentsAndError
             {
                 CheckArgumentsAndError::errorMessage("Couldn´t make temporary file for both parse and interpret",12);
             }
+            exec("touch ./templog",$output,$return_var);
+            if($return_var == 1)
+            {
+                CheckArgumentsAndError::errorMessage("Couldn´t make temporary file for both parse and interpret",12);
+            }
 
             $rc = file_get_contents($daco["dirname"]."/".$daco["filename"].".rc"); // nacitanie obsahu rc
 
@@ -292,7 +297,14 @@ class Test extends CheckArgumentsAndError
                     exec("php7.3 ".$this->parser. "< \"".$daco["dirname"]."/".$daco["filename"].".src\" > ./tempfileparse",$output,$ret_parse);
                     if($rc == $ret_parse)
                     {
-                        exec("java -jar /pub/courses/ipp/jexamxml/jexamxml.jar tempfileparse \"".$daco["dirname"]."/".$daco["filename"].".out\" /pub/courses/ipp/jexamxml/options",$output,$ret_parse);
+                        if($ret_parse != 0)
+                        {
+                            $ret_parse = 0;
+                        }
+                        else
+                        {
+                            exec("java -jar /pub/courses/ipp/jexamxml/jexamxml.jar tempfileparse \"".$daco["dirname"]."/".$daco["filename"].".out\" templog /D /pub/courses/ipp/jexamxml/options",$output,$ret_parse);
+                        }
                         if($ret_parse == 0)
                         {
                             echo "<font size=\"5\" color=\"green\">PASSED: TEST JEXAMXML:\t\t <strong>".$daco["basename"]."</strong></font><br>";
@@ -368,7 +380,7 @@ class Test extends CheckArgumentsAndError
             exec("rm -rf ./tempfileint");
             exec("rm -rf ./tempfileboth");
             exec("rm -rf ./tempoutput");
-
+            exec("rm -rf ./templog");
     }
 
 
@@ -393,10 +405,6 @@ class Test extends CheckArgumentsAndError
             }
         }
     }
-    public function printTest()
-    {
-
-    }
 }
 
 
@@ -410,6 +418,9 @@ class Htmlgen extends Test
         echo "<!DOCTYPE html>
     <html>
       <head>
+          <meta charset=\"utf-8\" />
+          <title>Test summary for ippcode19</title>
+      </head>
         <style>
           body {
             font-size: 14px;
@@ -471,7 +482,6 @@ class Htmlgen extends Test
             }
 
         </style>
-      </head>
       <body>
         <article>
             <h1>TEST SUMMARY FOR IPPCODE19 </h1>\n";
