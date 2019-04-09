@@ -67,11 +67,11 @@ class CheckArgumentsAndError
             }
             if(isset($opts["parse-script"]))
             {
-                $this->parser = $opts["parse-script"];
+                $this->parser = realpath($opts["parse-script"]);
             }
             if(isset($opts["int-script"]))
             {
-                $this->interpret = $opts["int-script"];
+                $this->interpret = realpath($opts["int-script"]);
             }
             if(isset($opts["parse-only"]))
             {
@@ -103,9 +103,10 @@ class CheckArgumentsAndError
             }
             if(isset($opts["directory"]))
             {
-                if(!is_dir($opts["directory"]))
+
+                if(!is_dir(realpath($opts["directory"])))
                 {
-                    self::errorMessage("Specified directory is not a directory",11);
+                    self::errorMessage("Specified directory is not a real directory",11);
                 }
                 $this->directory = realpath($opts["directory"])."/";
 
@@ -116,11 +117,11 @@ class CheckArgumentsAndError
             }
             if(isset($opts["parse-script"]))
             {
-                $this->parser = $opts["parse-script"];
+                $this->parser = realpath($opts["parse-script"]);
             }
             if(isset($opts["int-script"]))
             {
-                $this->interpret = $opts["int-script"];
+                $this->interpret = realpath($opts["int-script"]);
             }
             if(isset($opts["parse-only"]))
             {
@@ -135,13 +136,32 @@ class CheckArgumentsAndError
 
     public function checkFileExists()
     {
-        if(!file_exists($this->interpret))
+        if($this->intonly)
         {
-            self::errorMessage("Input file interpret.py doesn´t exists",11);
+            if(!file_exists($this->interpret))
+            {
+                self::errorMessage("Input file interpret.py doesn´t exists",11);
+            }
+
         }
-        if(!file_exists($this->parser))
+        elseif($this->parseonly)
         {
-            self::errorMessage("Input file parse.php doesn´t exists",11);
+            if(!file_exists($this->parser))
+            {
+                self::errorMessage("Input file parse.php doesn´t exists",11);
+            }
+        }
+        else
+        {
+            if(!file_exists($this->interpret))
+            {
+                self::errorMessage("Input file interpret.py doesn´t exists",11);
+            }
+            if(!file_exists($this->parser))
+            {
+                self::errorMessage("Input file parse.php doesn´t exists",11);
+            }
+
         }
         if(!is_dir($this->directory))
         {
@@ -172,6 +192,7 @@ class Test extends CheckArgumentsAndError
     public $testPassed = 0;
     public $testFail = 0;
     public $passedarray = array();
+
     public function runTest()
     {
         $in = false;
@@ -180,8 +201,10 @@ class Test extends CheckArgumentsAndError
         $tests;
         $passedarray;
         CheckArgumentsAndError::parseArguments($GLOBALS["argv"],$GLOBALS["argc"]);
+        CheckArgumentsAndError::checkFileExists();
         self::recursive($this->directory);
         $this->testCounter;
+        $oldpath = "";
         foreach($this->tests as $files)
         {
             $daco = pathinfo($files);
@@ -251,6 +274,19 @@ class Test extends CheckArgumentsAndError
 
             if($daco["basename"] == $daco["filename"].".src")
             {
+                if($daco["dirname"] != $oldpath)
+                {
+                    echo "\n
+                        <div><br>
+                          <br>
+                          <section>
+                              <h3>FOLDER: <strong>".$daco["dirname"]."</strong></h3>
+                              <br>
+                          </section>
+                        </div>\n";
+                        $oldpath = $daco["dirname"];
+                }
+                //echo "<br><br><br><font size=\"2\" color=\"black\">Test #" . $this->testCounter . " </font><br>";
                 if($this->parseonly == true)
                 {
                     exec("php7.3 ".$this->parser. "< \"".$daco["dirname"]."/".$daco["filename"].".src\" > ./tempfileparse",$output,$ret_parse);
@@ -259,22 +295,21 @@ class Test extends CheckArgumentsAndError
                         exec("java -jar /pub/courses/ipp/jexamxml/jexamxml.jar tempfileparse \"".$daco["dirname"]."/".$daco["filename"].".out\" /pub/courses/ipp/jexamxml/options",$output,$ret_parse);
                         if($ret_parse == 0)
                         {
+                            echo "<font size=\"5\" color=\"green\">PASSED: TEST JEXAMXML:\t\t <strong>".$daco["basename"]."</strong></font><br>";
 
-                            print("TEST:\t\t".$daco["basename"].":\t\tPASSED\n");
-                            //    $this->passedarray = $daco["basename"];
                             $this->testPassed++;
 
                         }
                         else
                         {
-                            print("TEST:\t\t".$daco["basename"].":\t\tFAILED\n");
+                            echo "<font size=\"5\" color=\"green\">FAILED: TEST JEXAMXML:\t\t <strong>".$daco["basename"]."</strong></font><br>";
                             $this->testFail++;
 
                         }
                     }
                     else
                     {
-                        print("TEST RC FAILED\t\t:".$daco["basename"].":\t\tFAILED\n");
+                        echo "<font size=\"5\" color=\"red\">FAILED: TEST RC:\t\t <strong>".$daco["basename"]."</strong><strong>  (expected RC should be :".$rc." real RC is: ".$ret_parse.")</strong> </font><br>";
                         $this->testFail++;
                     }
                 }
@@ -286,18 +321,18 @@ class Test extends CheckArgumentsAndError
                         exec("diff \"".$daco["dirname"]."/".$daco["filename"].".out\" tempfileint",$output,$diff_ret);
                         if($diff_ret == 0)
                         {
-                            print("TEST DIFF:\t\t".$daco["basename"]."\t\tPASSED\n");
+                            echo "<font size=\"5\" color=\"green\">PASSED: TEST DIFF:\t\t <strong>".$daco["basename"]."</strong></font><br>";
                             $this->testPassed++;
                         }
                         else
                         {
-                            print("TEST DIFF\t\t".$daco["basename"].":\t\tFAILED\n");
+                            echo "<font size=\"5\" color=\"red\">FAILED: TEST DIFF:\t\t <strong>".$daco["basename"]."</strong></font><br>";
                             $this->testFail++;
                         }
                     }
                     else
                     {
-                        print("TEST RC:\t\t".$daco["basename"].":\t\tFAILED\n");
+                        echo "<font size=\"5\" color=\"red\">FAILED: TEST RC:\t\t <strong>".$daco["basename"]."</strong><strong>  (expected RC should be :".$rc."  real RC is: ".$rc_return_var.")</strong> </font><br>";
                         $this->testFail++;
                     }
                 }
@@ -310,18 +345,19 @@ class Test extends CheckArgumentsAndError
                         exec("diff \"".$daco["dirname"]."/".$daco["filename"].".out\" tempoutput",$output,$diff_ret);
                         if($diff_ret == 0)
                         {
-                            print("TEST\t\t:".$daco["basename"]."\t\t\t\t PASSED\n");
+
+                            echo "<font size=\"5\" color=\"green\">PASSED: TEST DIFF:\t\t <strong>".$daco["basename"]."</strong></font><br>";
                             $this->testPassed++;
                         }
                         else
                         {
-                            print("TEST ".$daco["basename"].":\t\t\t FAILED\n");
+                            echo "<font size=\"5\" color=\"red\">FAILED: TEST DIFF:\t\t <strong>".$daco["basename"]."</strong></font><br>";
                             $this->testFail++;
                         }
                     }
                     else
                     {
-                        print("TEST:".$daco["basename"].":\t\t\tFAILED\n");
+                        echo "<font size=\"5\" color=\"red\">FAILED: TEST RC:\t\t <strong>".$daco["basename"]."</strong><strong>  (expected RC should be :".$rc."  real RC is : ".$rc_return_var.")</strong> </font><br>";
                         $this->testFail++;
                     }
                 }
@@ -332,9 +368,7 @@ class Test extends CheckArgumentsAndError
             exec("rm -rf ./tempfileint");
             exec("rm -rf ./tempfileboth");
             exec("rm -rf ./tempoutput");
-            print("\nPOCET TESTOV:" .$this->testCounter."\n");
-            print("POCET PREJDENYCH:".$this->testPassed);
-            print("\nPOCET NEPREJDENYCH: ".$this->testFail."\n");
+
     }
 
 
@@ -359,58 +393,134 @@ class Test extends CheckArgumentsAndError
             }
         }
     }
+    public function printTest()
+    {
+
+    }
 }
 
 
 
 
 
-//class HTMLgen
-//{
-//    public function generateHtmlPage()
-//
-/*$html =
-        '<!doctype html>
-        <html lang=\"cz\">
-        <head>
-            <meta charset=\"utf-8\">
-            <title>IPPCODE19 TEST</title>
-            <meta name=\"TESTY PRE INTERPRET A PARSER\">
-            <meta name=\"RENE BOLF\">
+class Htmlgen extends Test
+{
+    public function generateHtmlPage()
+    {
+        echo "<!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body {
+            font-size: 14px;
+            padding-top: 0%;
+            text-align: left;
+            font: 14px Verdana;
+            color: white;
+            background-color: #101111;
+            padding-left: 40px;
+          }
+          h1
+          {
+              font-size: 2em;
+              font-weight: normal;
+              color: white;
+              text-align: center;
+              text-shadow: 2px 2px 1px #0a294b;
+          }
+          h2 {
+            text-align: left;
+            color: white;
+            font-family: Arial;
+            text-shadow: 3px 3px 7px #0a294b;
+          }
+          h3
+          {
+              text-align: left;
+              color: white;
+              font-family: 'monospaced', monospace;
 
-            <style>
-                h1 {
-                    text-align: center;
-                    color: #676d6a;
-                }
-                .background-gray{
-                    background: #00000;
-                }
-                .failed {
-                    color: #e03d3d;
-                }
-                .passed {
-                    color: #00b700;
-                }
-                .center {
-                    text-align: center;
-                }
-                .left {
-                    text-align: left;
-                }
-            </style>
-        </head>
-        <body>;
-</html*/
-//echo $html;
-//    }
-//}
+          }
+          table, th, td {
+              border: 1px solid white;
+              border-collapse: collapse;
+            }
+            th, td {
+              padding: 5px;
+              text-align: center;
+
+            }
+            table{
+                width:50%;
+            }
+            caption{
+                text-align:left;
+                font-family: Arial;
+                text-shadow: 3px 3px 7px #0a294b;
+                color: #white;
+                font-size: 1.5em;
+                font-weight: bold;
+                padding-bottom: 10px;
+
+            }
+
+            article
+            {
+                padding: 30px 0px;
+            }
+
+        </style>
+      </head>
+      <body>
+        <article>
+            <h1>TEST SUMMARY FOR IPPCODE19 </h1>\n";
+            if ($this->parseonly == true) {
+                echo "\n
+            <div>
+              MODE: <h2<strong>parse-only</strong><br><br></h2>
+            </div>\n";
+        } elseif ($this->intonly == true) {
+                echo "\n
+            <div>
+              MODE: <h2><strong>int-only</strong><br><br></h2>
+            </div>\n";
+            } else {
+                echo "\n
+            <div>
+                <h2>MODE: <strong>BOTH (INTERPRET, PARSER)</strong><br><br></h2>
+            </div>\n";
+            }
+            Test::runTest();
+            echo "\n
+            <div>
+                <br><br>
+
+                    <table>
+                    <caption>RESULT</caption>
+                      <tr>
+                        <th>ALL</th>
+                        <th>FAILED</th>
+                        <th>PASSED</th>
+                      </tr>
+                      <tr>
+                        <td><font size =\"3\" color=\"white\"<strong>".$this->testCounter."</strong></td>
+                        <td><font size=\"3\" color=\"red\"><strong>".$this->testFail."</strong></font></td>
+                        <td><font size=\"3\" color=\"green\"><strong>".$this->testPassed."</strong></font></td>
+                      </tr>
+                    </table>
+
+            </div>
+        </article>
+          </body>
+    </html>\n";
+    }
+
+    }
+
 $Argument = new CheckArgumentsAndError();
 //$Argument->parseArguments($argc,$argv);
-$Argument->checkFileExists();
 $test = new Test();
-$test->runTest();
-//$HtmlGenerator = new HTMLgen
-//$HtmlGenerator->generateHtmlPage();
+$HtmlGenerator = new Htmlgen;
+$HtmlGenerator->generateHtmlPage();
 
  ?>
