@@ -452,6 +452,7 @@ class Htmlgen extends Test
             }
             table{
                 width:50%;
+                padding-bottom: 10px;
             }
             caption{
                 text-align:left;
@@ -474,29 +475,30 @@ class Htmlgen extends Test
       <body>
         <article>
             <h1>TEST SUMMARY FOR IPPCODE19 </h1>\n";
-            if ($this->parseonly == true) {
-                echo "\n
-            <div>
-              MODE: <h2<strong>parse-only</strong><br><br></h2>
-            </div>\n";
-        } elseif ($this->intonly == true) {
-                echo "\n
-            <div>
-              MODE: <h2><strong>int-only</strong><br><br></h2>
-            </div>\n";
-            } else {
-                echo "\n
-            <div>
-                <h2>MODE: <strong>BOTH (INTERPRET, PARSER)</strong><br><br></h2>
-            </div>\n";
-            }
             Test::runTest();
             echo "\n
             <div>
                 <br><br>
-
                     <table>
-                    <caption>RESULT</caption>
+                    <caption>";
+                    if ($this->parseonly == true) {
+                        echo "\n
+                    <div>
+                      RESULT MODE: <strong>parse-only</strong>
+                    </div>\n";
+                } elseif ($this->intonly == true) {
+                        echo "\n
+                    <div>
+                      RESULT MODE: <strong>int-only</strong>
+                    </div>\n";
+                    } else {
+                        echo "\n
+                    <div>
+                        RESULT MODE: <strong>BOTH (INTERPRET, PARSER)</strong>
+                    </div>\n";
+                    }
+                    echo "
+                    </caption>
                       <tr>
                         <th>ALL</th>
                         <th>FAILED</th>
