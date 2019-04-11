@@ -4,18 +4,32 @@
 # @file interpret.php
 # autor René Bolf xbolfr00@stud.fit.vutbr.cz
 import sys
-import xml.etree.ElementTree as ElementTree
-import re
+import xml.etree.ElementTree as ElementTree # for XML
+import re # for regular expression
+
 
 def errorMessage(message,exitCode):
+    """ This function is for processing error code and errorMessage"""
     print("ERR: " + message + "\n", file = sys.stderr)
     sys.exit(exitCode)
 
 def showHelp():
-     print("doplnit")
+    """ This function is for printing help"""
+     print("""
+      **********************************HELP************************************************************************************************************************************************
+      HELP : --help print help
+      This script load XML program representation from specified file and interprets the program using standart input and standart output
+      Input XMl is from parse.php but no necessarily from source code in IPPCODE19
+     ******************************HOW TO RUN *********************************************************************************************************************************************
+     --help - print help
+     --source=file input file with XML representation of source code according to specification
+     --input=file file with input for interpretation specified source code
+     --parse-script=file - file with script in PHP7.3 for analysis source code in IPPcode19(if this parameter is missing, so implicity vaulue is parse.php (in acutal direcotry))
+     """)
      sys.exit(0)
 
 STDINInput = False
+########################### CHECKING ARGUMENTS ############################################################
 if len(sys.argv) > 3 and len(sys.argv) < 2 :
     errorMessage("Wrong count of arguments",10)
 
@@ -45,16 +59,16 @@ elif len(sys.argv) == 3:
         errorMessage("Bad arguments",10)
 else:
     errorMessage("Bad arguments",10)
-
+############################# LOADING XML ###################################################################################
 try:
     dom = ElementTree.parse(argv_source) #object
 except OSError as error:
-    errorMessage(error.args[1],11) #vyhodenie except ked otvaras subor
+    errorMessage(error.args[1],11) # except when open files
 except ElementTree.ParseError as error:
-    errorMessage(error.args[0],31) #ked nieje well formated
+    errorMessage(error.args[0],31) #when is no  well formated
 
 root_program = dom.getroot()#root program
-
+################################# CHECKING XML ########################################################################
 if(root_program.tag != "program"):
     errorMessage("In XML is wrong root tag use --help",32)
 
@@ -78,6 +92,7 @@ reg_label = "^([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\
 reg_type = "^(int|string|bool)$"
 
 def symbolCheck(attribType,operand):
+    """ FUnction for check symbol [int,string,nil,bool,var]"""
     if(attribType == "int"):
         check_symbolint = re.search("^((\+|-)?[0-9]\d*)$",operand)
         if not check_symbolint:
@@ -104,26 +119,29 @@ def symbolCheck(attribType,operand):
         errorMessage("Wrong symbol",32)
 
 def variableCheck(attribType,operand):
+""" FUnction for check variable [var]"""
     if(attribType == "var"):
         check_var = re.search("^(LF|GF|TF)@([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$",operand)
         if not check_var:
             errorMessage("Wrong entered type: var",32)
 
 def labelCheck(attribType,operand):
+    """ FUnction for check label [label]"""
     if(attribType == "label"):
         check_label = re.search("^([a-zA-Z]|[_|\-|\$|&|%|\?|\!|\*])([a-zA-Z]|[0-9]|[_|\-|\$|&|%|\?|\!|\*])*$",operand)
         if not check_label:
             errorMessage("Wrong entered type: label",32)
 
 def typeCheck(attribType,operand):
+    """ FUnction for check type [int,string,bool]"""
     if(attribType == "type"):
         check_type = re.search("^(int|string|bool)$",operand)
         if not check_type:
             errorMessage("Wrong entered type: type",32)
 
 
-#TODO analyza xml
-#KONTROLA ELEMENTU instruction či tam je a či obsahuje opcode a order
+
+#Check ELEMENT instruction  [opcode a order]
 for instruction in root_program:
     if(instruction.tag != "instruction"):
         errorMessage("Missing instruction element",32)
@@ -134,8 +152,7 @@ for instruction in root_program:
         if "order" not in instruction.attrib or "opcode" not in instruction.attrib:
             errorMessage("Missing order or opcode",32)
 ###################################################################################
-#KONTROLA JEDNOTLIVYCH opcode
-# ZACNEME tymi čo maju 0 operandov
+#Check specified opcode [Lexical,Syntaktic]
 # 0 operandov CREATEFRAME PUSHFRAME POPFRAME RETURN break
     if instruction.attrib["opcode"] in ["CREATEFRAME","PUSHFRAME","POPFRAME","RETURN","BREAK"]: #something like switch
         for argument in instruction:
@@ -146,7 +163,7 @@ for instruction in root_program:
             if(argument.tag != 0):
                 errorMessage("Wrong count of arguments in instruction: CREATEFRAME,PUSHFRAME,POPFRAME,RETURN,BREAK",32)
 ###################################################################################################################
-# 1 operand  [var]  DEFVAR, POPS TODO ked mas v instukci arg1 arg1
+# 1 operand  [var]  DEFVAR, POPS
     elif instruction.attrib["opcode"].upper() in ["DEFVAR","POPS"]:
         counter_arg = 0
         for argument in instruction:
@@ -238,7 +255,7 @@ for instruction in root_program:
     else:
         errorMessage("Unknown operation code",32)
 
-#zoradenie xmlka
+###################### SORTING XML (arg and order)#####################################################
 root_program[:] = sorted(root_program, key=lambda child: int(child.get("order")))
 for child in root_program:
     child[:] = sorted(child, key =lambda child: child.tag)
@@ -348,15 +365,16 @@ for instruction in root_program:
     counter_order += 1
 
 
-GF = {} # vytvorenie slovnika pre GF ramec teda globalny ramec
-TF = None # temporary frame si nastavíme zatial na none čiže neni defined
-LF = []
-dataStack = []
-callStack = []
+GF = {} # create dictionary for Global frame c
+TF = None # temporary frame set to None value (is not defined)
+LF = [] # list (stack) for local frame
+dataStack = [] #stack for variable(data)
+callStack = [] # stack for call label
 Labels = {}
 
 def identifFrame(variable,value,typ):
-    frame = variable.split("@",1)[0]
+    """ FUnction for identifi frame [Global frame, temporary frame, local frame]"""
+    frame = variable.split("@",1)[0] # split @ from variable
     variableName = variable.split("@",1)[1]
     if typ == "string":
         value = replaceEscapeSeq(value)
@@ -383,6 +401,7 @@ def identifFrame(variable,value,typ):
             errorMessage("Access to undefined local frame",55)
 
 def getVar(variable):
+    """ FUnction for getting variable from frame"""
     frame = variable.split("@",1)[0]
     variableName = variable.split("@",1)[1]
     if frame == "GF":
@@ -413,6 +432,7 @@ def getVar(variable):
             errorMessage("Access to undefined local frame",55)
 
 def replaceEscapeSeq(string):
+    """ FUnction for replacing escape seqvencies"""
     if not string:
         return ""
     string1 = re.findall("[0-9]{3}", string)
@@ -971,8 +991,8 @@ while counter < counter_order - 1:
 
 
 #################################### MOVE ################################################################
-    elif instruction.attrib["opcode"].upper() == "MOVE": #<var> <symb> | moze byt var [int,string,bool,nil] alebo var var
-        if instruction[1].attrib["type"] == "var": #ak je symb var
+    elif instruction.attrib["opcode"].upper() == "MOVE": #<var> <symb> | can be var [int,string,bool,nil] or var var
+        if instruction[1].attrib["type"] == "var": #if  symb is var
             var = getVar(instruction[1].text)
             if var[0] == "string":
                 var[1] = replaceEscapeSeq(var[1])
@@ -986,9 +1006,7 @@ while counter < counter_order - 1:
             errorMessage("Wrong type in MOVE",53)
 #################################### CREATEFRAME #################################################################
     elif instruction.attrib["opcode"].upper() == "CREATEFRAME":
-
         TF = {}
-
 ################################################ PUSHFRAME ######################################################
     elif instruction.attrib["opcode"].upper() == "PUSHFRAME":
         if TF == None:
@@ -1109,8 +1127,7 @@ while counter < counter_order - 1:
                     else:
                         counter = Labels.get(instruction[0].text)
                         continue # preto aby sme skocili hore do cyklu a nepokracovali dalej
-
-
+                        
             elif instruction.attrib["opcode"].upper() == "JUMPIFNEQ":
                 result = not operand1 == operand2
                 if result:
